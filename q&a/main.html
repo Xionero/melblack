@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ส่งคำถาม</title>
+    <style>
+        body {
+    background-image: url('black.png'); /* แทนที่ path/to/your/wallpaper.jpg ด้วยเส้นทางของภาพจริง */
+    background-size: auto; /* ปรับขนาดของภาพให้ครอบคลุมพื้นที่ทั้งหมด */
+    background-repeat: no-repeat; /* ป้องกันไม่ให้ภาพซ้ำ */
+    color: #fff; /* ตั้งค่าสีข้อความให้เป็นสีขาวเพื่อความคมชัด */
+}
+
+        form {
+            max-width: 500px;
+            margin: auto;
+            background-color: rgba(255, 255, 255, 0.9); /* Slightly opaque white background for the form */
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center align form items */
+        }
+
+        label {
+            font-size: 1.5em; 
+            display: block;
+            margin: 5px 0;
+        }
+
+        input {
+            font-size: 1.2em; /* Slightly smaller font size */
+            display: block;
+            margin: 5px 0;
+            text-align: center;
+        }
+
+        textarea {
+            font-size: 1.2em; 
+            display: block;
+            margin: 5px 0;
+        }
+
+        input[type="submit"] {
+            background-color: #9DEFFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            text-align: center;
+            background-color: #8AEFFF;
+        }
+
+        #error-message {
+            color: red;
+        }
+    </style>
+    <!-- CSS: Bootstrap v-5.3 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <br>
+    <br>
+    <form action="" method="post" onsubmit="submitForm(); return false;" accept-charset="UTF-8" autocomplete="off" name="question">
+        <input type="text" id="sender" name="youtube_name" placeholder="YoutubeName" required>
+        <br>
+        <input type="text" id="title" name="anime_name" placeholder="AnimeName" required>
+        <br>
+        <textarea id="question" name="ask" placeholder="ช่องสำหรับใส่คำถาม" rows="4" cols="50" required></textarea>
+        <br>
+        <textarea id="answer" name="answer" placeholder="ช่องสำหรับใส่คำตอบ" rows="4" cols="50" required></textarea>
+        <br>
+        <div class="text-center">
+            <input type="submit" value="ส่ง">
+        </div>
+        <!-- Message Display -->
+        <p id="demo"></p>
+        <p>กรุณากรอกข้อมูลให้ครบถ้วน</p>
+    </form>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxhxlJYmotLw2T14jaELYbXbo3LcBGSFg0Tiw9DHzHwMNMoWcXrYtP7AcX60pyr4HXEjQ/exec';
+        const form = document.forms['question'];
+
+        function submitForm() {
+            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+                .then(response => {
+                    const message = "<div class='alert alert-primary' role='alert'><b>ได้รับเรียบร้อยแล้วขอบคุณที่ร่วมสนุก</b></div>";
+                    document.getElementById("demo").innerHTML = message;
+                    form.reset();
+                    setTimeout(() => {
+                        document.getElementById("demo").innerHTML = '';
+                    }, 3000); // 3000 milliseconds = 3 seconds
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                });
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
