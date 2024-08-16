@@ -126,7 +126,7 @@
             }, 3000);
 
             // Check if all required fields are filled
-            if (form.Name.value && form.Job.value && form.SubJob.value && form.race.value && form.image.value) {
+            if (form.name.value && form.Job.value && form.SubJob.value && form.race.value && form.image.value) {
                 // Send data to Google Apps Script
                 fetch(scriptURL, { method: 'POST', body: new FormData(form) })
                     .then(response => {
