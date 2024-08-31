@@ -26,8 +26,8 @@
         select, input, textarea {
             font-size: 1.2em;
             display: block;
-            margin: 10px 0; /* เพิ่มช่องว่างระหว่าง element */
-            width: calc(100% - 20px); /* ปรับขนาดกว้างของ input, select, textarea */
+            margin: 10px 0;
+            width: calc(100% - 20px);
         }
 
         input[type="submit"] {
@@ -38,12 +38,33 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
-            margin-top: 20px; /* ให้ปุ่มส่งห่างจากข้อมูลอื่นๆ */
+            margin-top: 20px;
         }
 
         #demo, p {
-            margin-top: 20px; /* ให้ข้อความแจ้งเตือนห่างจากฟอร์ม */
+            margin-top: 20px;
         }
+
+        .preview-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .preview-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .preview-container img {
+        width: 60px;
+        height: 80px;
+        margin-right: 15px;
+        border-radius: 5px;
+        border: 3px solid #000;
+        object-fit: cover;
+        margin-top: -20px;
+    }
     </style>
     <!-- CSS: Bootstrap v-5.3 -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -102,9 +123,14 @@
             <option value="Werewolf">Werewolf</option>
         </select>
         <br>
-        <input type="text" id="answer" name="image" placeholder="Urlรูปที่แสดงในบัตร แปะลิงค์รูป" required>
+        <input type="text" id="answer" name="image" placeholder="Urlรูปที่แสดงในบัตร แปะลิงค์รูป" required oninput="updatePreview()">
         <br>
         <input type="hidden" id="zeny" name="Zeny" value="0">
+
+        <!-- Preview Container -->
+        <div class="preview-container">
+            <img id="imagePreview" src="https://xionero.github.io/melblack/preview.jpg" alt="Image Preview">
+        </div>
 
         <div class="text-center">
             <input type="submit" value="ยืนยัน" onclick="submitForm()">
@@ -117,28 +143,32 @@
         const scriptURL = 'https://script.google.com/macros/s/AKfycbx1piVKZij8VJnYzwDG03BCXQQX1sPlcWYcDFjpT9WiPJQROYGmKFGzhqRtDqy5E7CBkQ/exec';
         const form = document.forms['datacard'];
         const submitButton = form.querySelector('input[type="submit"]');
+        const imagePreview = document.getElementById('imagePreview');
+        const imageUrlField = document.getElementById('answer');
+
+        function updatePreview() {
+            const url = imageUrlField.value;
+            imagePreview.src = url || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeViKxAyvqTM5AUcLtccwdOYareVd_SlsQtQ&s';
+        }
 
         function submitForm() {
-            // Disable the submit button for 3 seconds
             submitButton.disabled = true;
             setTimeout(() => {
                 submitButton.disabled = false;
             }, 3000);
 
-            // Check if all required fields are filled
             if (form.name.value && form.Job.value && form.SubJob.value && form.race.value && form.image.value) {
-                // Send data to Google Apps Script
                 fetch(scriptURL, { method: 'POST', body: new FormData(form) })
                     .then(response => {
                         form.reset();
                         document.getElementById('demo').innerHTML = "ส่งเรียบร้อยแล้ว";
+                        imagePreview.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeViKxAyvqTM5AUcLtccwdOYareVd_SlsQtQ&s';
                     })
                     .catch(error => {
                         console.error('Error!', error.message);
                         document.getElementById('demo').innerHTML = "เกิดข้อผิดพลาดในการส่งข้อมูล";
                     });
             } else {
-                // If required fields are not filled, show a warning message
                 document.getElementById('demo').innerHTML = "กรุณากรอกข้อมูลให้ครบถ้วน";
             }
         }
