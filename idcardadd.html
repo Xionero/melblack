@@ -83,10 +83,10 @@
             <option value="Monk">Monk</option>
             <option value="Thief">Thief</option>
             <option value="Lancer">Lancer</option>
-            <option value="Necromancer">Necromancer</option>
+            <option value="Necromancy">Necromancy</option>
             <option value="Samurai">Samurai</option>
             <option value="Ninja">Ninja</option>
-            <option value="Magic Sword">Magic Sword</option>
+            <option value="Spell Blade">Spell Blade</option>
             <option value="Wizard">Wizard</option>
             <option value="Priest">Priest</option>
             <option value="Summoner">Summoner</option>
@@ -96,31 +96,37 @@
         <br>
         <!-- เปลี่ยน input เป็น select -->
         <select id="subJob" name="SubJob" required>
-            <option value="">เลือกอาชีพรอง</option>
+            <option value="" disabled selected>เลือกอาชีพรอง</option>
             <option value="Angler">Angler</option>
+            <option value="Architect">Architect</option>            
             <option value="Archaeologist">Archaeologist</option>
+            <option value="Bounty">Bounty</option>
             <option value="Chef">Chef</option>
+            <option value="Circus">Circus</option>  
+            <option value="Blacksmith">Blacksmith</option>
             <option value="Detective">Detective</option>
+            <option value="Engineer">Engineer</option>
             <option value="Library">Library</option>
             <option value="Merchant">Merchant</option>
-            <option value="Spy">Spy</option>
+            <option value="Spy">Spy</option>   
         </select>
         <br>
         <!-- เปลี่ยน input เป็น select -->
         <select id="race" name="race" required>
             <option value="" disabled selected>เลือกเผ่า</option>
-            <option value="Human">Human</option>
+            <option value="Cait Sith">Cait Sith</option>
+            <option value="Dragon">Dragon</option>
+            <option value="Dryad">Dryad</option>
             <option value="Elf">Elf</option>
             <option value="Fallen Angel">Fallen Angel</option>
-            <option value="Half Demon">Half Demon</option>
-            <option value="Dragon">Dragon</option>
-            <option value="Cait Sith">Cait Sith</option>
             <option value="Goblin">Goblin</option>
+            <option value="Human">Human</option>
+            <option value="Half Demon">Half Demon</option>   
             <option value="Orc">Orc</option>
-            <option value="Ogre">Ogre</option>
-            <option value="Dryad">Dryad</option>
+            <option value="Ogre">Ogre</option>        
             <option value="Vampire">Vampire</option>
             <option value="Werewolf">Werewolf</option>
+            <option value="Undead">Undead</option>
         </select>
         <br>
         <input type="text" id="answer" name="image" placeholder="ใส่ url ของรูปภาพ ถ้าใส่ถูกต้องรูปจะแสดงให้ดู" required oninput="updatePreview()">
