@@ -62,6 +62,7 @@
             box-sizing: border-box;
             background: #fff;
             color: #555;
+            resize: none; /* Disable resizing */
         }
 
         input::placeholder, textarea::placeholder {
@@ -96,10 +97,10 @@
 <body>
     <form action="" method="post" onsubmit="submitForm(); return false;" accept-charset="UTF-8" autocomplete="off" name="question">
 
-        <input type="text" id="sender" name="youtube_name" placeholder="ชื่อYoutubeของคุณ" required>
+        <input type="text" id="sender" name="youtube_name" placeholder="ชื่อผู้ส่ง" required>
         
 
-        <input type="text" id="title" name="anime_name" placeholder="บอกชื่อเรื่อง" required>
+        <input type="text" id="title" name="anime_name" placeholder="ชื่อเรื่อง" required>
         
 
         <textarea id="question" name="ask" placeholder="ใส่คำถาม" rows="4" required></textarea>
@@ -116,13 +117,23 @@
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbz3CXOxlTHUtqtnyV6d2ZMHBFUIP9qVGvwdBT18pYArH6kR7ydFs6Fi8VM2JAv4ilImVQ/exec';
         const form = document.forms['question'];
-
+    
         function submitForm() {
             fetch(scriptURL, { method: 'POST', body: new FormData(form)})
                 .then(response => {
                     const message = "<div class='alert alert-primary' role='alert'><b>ส่งเรียบร้อยแล้ว </b></div>";
                     document.getElementById("demo").innerHTML = message;
+                    
+                    // Preserve the values of sender and title fields
+                    const senderValue = form['youtube_name'].value;
+                    const titleValue = form['anime_name'].value;
+    
                     form.reset();
+    
+                    // Restore the values of sender and title fields
+                    form['youtube_name'].value = senderValue;
+                    form['anime_name'].value = titleValue;
+    
                     setTimeout(() => {
                         document.getElementById("demo").innerHTML = '';
                     }, 3000); // 3000 milliseconds = 3 seconds
@@ -132,5 +143,6 @@
                 });
         }
     </script>
+    
 </body>
 </html>
