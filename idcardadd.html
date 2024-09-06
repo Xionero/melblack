@@ -76,6 +76,26 @@
         <input type="text" id="title" name="name" placeholder="ชื่อ Youtube ที่ใช้สำหรับ update ข้อมูล rank และ score" required>
         <br>
         <input type="text" id="title" name="handlename" placeholder="ชื่อ ที่จะแสดงบนการ์ด พยายามอย่าใส่เกิน 20 อักษร" required>
+        <br>     
+        <!-- เปลี่ยน input เป็น select -->
+        <select id="race" name="race" required>
+            <option value="" disabled selected>เลือกเผ่า</option>
+            <option value="Human">Human</option>
+            <option value="Elf">Elf</option>
+            <option value="Dwarf">Dwarf</option>
+            <option value="Orc">Orc</option>
+            <option value="Goblin">Goblin</option>
+            <option value="Fairy">Fairy</option>
+            <option value="Dryad">Dryad</option>
+            <option value="Dragon">Dragon</option>   
+            <option value="Vampire">Vampire</option>
+            <option value="Werebeast">Werebeast</option>        
+            <option value="Mermaid">Mermaid</option>
+            <option value="Angel">Angel</option>
+            <option value="Demon">Demon</option>
+            <option value="Slime">Slime</option>
+            <option value="Undead">Undead</option>
+        </select>
         <br>
         <!-- เปลี่ยน input เป็น select -->
         <select id="mainJob" name="Job" required>
@@ -124,26 +144,6 @@
             <option value="Pharmacy">Pharmacy</option>
             <option value="Spy">Spy</option>   
             <option value="Zookeeper">Zookeeper</option>   
-        </select>
-        <br>
-        <!-- เปลี่ยน input เป็น select -->
-        <select id="race" name="race" required>
-            <option value="" disabled selected>เลือกเผ่า</option>
-            <option value="Human">Human</option>
-            <option value="Elf">Elf</option>
-            <option value="Dwarf">Dwarf</option>
-            <option value="Orc">Orc</option>
-            <option value="Goblin">Goblin</option>
-            <option value="Fairy">Fairy</option>
-            <option value="Dryad">Dryad</option>
-            <option value="Dragon">Dragon</option>   
-            <option value="Vampire">Vampire</option>
-            <option value="Werebeast">Werebeast</option>        
-            <option value="Mermaid">Mermaid</option>
-            <option value="Angel">Angel</option>
-            <option value="Demon">Demon</option>
-            <option value="Slime">Slime</option>
-            <option value="Undead">Undead</option>
         </select>
         <br>
         <input type="text" id="answer" name="image" placeholder="ใส่ url ของรูปภาพ ถ้าใส่ถูกต้องรูปจะแสดงให้ดู" required oninput="updatePreview()">
