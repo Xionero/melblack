@@ -217,7 +217,7 @@
                 fetch(scriptURL, { method: 'POST', body: new FormData(form) })
                     .then(response => {
                         form.reset();
-                        document.getElementById('demo').innerHTML = "ส่งเรียบร้อยแล้ว";
+                        document.getElementById('demo').innerHTML = "ส่งเรียบร้อยแล้ว กรุณารอประมาน 1 นาทีเพื่อ update ข้อมูลใหม่";
                         imagePreview.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeViKxAyvqTM5AUcLtccwdOYareVd_SlsQtQ&s';
                         handleSelection(); // Reset fields
                     })
