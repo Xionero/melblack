@@ -136,7 +136,7 @@
             <option value="Slime">Slime</option>
             <option value="Undead">Undead</option>
         </select>
-        <select id="mainJob" class="hidden" name="Job">
+        <select id="mainJob" class="hidden" name="class">
             <option value="" disabled selected>เลือกอาชีพหลัก</option>
             <option value="Archer">Archer</option>
             <option value="Assassin">Assassin</option>        
@@ -157,7 +157,7 @@
             <option value="Warrior">Warrior</option>
             <option value="Wizard">Wizard</option>
         </select>
-        <select id="subJob" class="hidden" name="SubJob">
+        <select id="subJob" class="hidden" name="job">
             <option value="" disabled selected>เลือกอาชีพรอง</option>
             <option value="Angler">Angler</option>
             <option value="Alchemist">Alchemist</option>
@@ -214,8 +214,8 @@
             // Show or hide input fields based on checkbox selection
             document.getElementById('nameDisplay').classList.toggle('hidden', !isNameDisplayChecked);
             document.getElementById('race').classList.toggle('hidden', !isRaceChecked);
-            document.getElementById('mainJob').classList.toggle('hidden', !isMainJobChecked);
-            document.getElementById('subJob').classList.toggle('hidden', !isSubJobChecked);
+            document.getElementById('class').classList.toggle('hidden', !isMainJobChecked);
+            document.getElementById('job').classList.toggle('hidden', !isSubJobChecked);
             document.getElementById('imageUrl').classList.toggle('hidden', !isImageChecked);
             imagePreviewContainer.classList.toggle('hidden', !isImageChecked);
         }
