@@ -98,7 +98,7 @@
         </select>
         <br>
         <!-- เปลี่ยน input เป็น select -->
-        <select id="mainJob" name="Job" required>
+        <select id="class" name="class" required>
             <option value="" disabled selected>Class</option>
             <option value="Archer">Archer</option>
             <option value="Assassin">Assassin</option>
@@ -121,7 +121,7 @@
         </select>
         <br>
         <!-- เปลี่ยน input เป็น select -->
-        <select id="subJob" name="SubJob" required>
+        <select id="job" name="job" required>
             <option value="" disabled selected>Job</option>
             <option value="Angler">Angler</option>
             <option value="Alchemist">Alchemist</option>  
@@ -149,7 +149,7 @@
         <br>
         <input type="text" id="answer" name="image" placeholder="ใส่ URL ของรูปภาพ ถ้าใส่ถูกรูปจะแสดงบน Preview" required oninput="updatePreview()">
         <br>
-        <input type="hidden" id="zeny" name="Zeny" value="0">
+        <input type="hidden" id="zeny" name="zeny" value="0">
 
         <!-- Preview Container -->
         <div class="preview-container">
@@ -181,7 +181,7 @@
                 submitButton.disabled = false;
             }, 3000);
 
-            if (form.name.value && form.Job.value && form.SubJob.value && form.race.value && form.image.value) {
+            if (form.name.value && form.class.value && form.job.value && form.race.value && form.image.value) {
                 fetch(scriptURL, { method: 'POST', body: new FormData(form) })
                     .then(response => {
                         form.reset();
