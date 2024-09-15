@@ -27,7 +27,7 @@
     table {
       border-collapse: collapse;
       width: 400px; /* Adjusted table width */
-      height: 800px; /* Adjusted table height */
+      height: auto; /* Adjusted table height to auto */
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Darker shadow */
@@ -37,6 +37,7 @@
       border: 1px solid #444; /* Darker border */
       padding: 10px; /* Adjusted padding */
       text-align: center; /* Center align text */
+      vertical-align: middle; /* Center content vertically */
     }
     th {
       background-color: #3e3e3e; /* Darker gray background */
@@ -49,21 +50,119 @@
     tr:hover {
       background-color: #444; /* Darker hover background */
     }
+    .race-icon {
+      max-width: 30px; /* Limit image width */
+      max-height: 30px; /* Limit image height */
+      border-radius: 50%;
+      width: auto; /* Maintain aspect ratio */
+      height: auto; /* Maintain aspect ratio */
+      display: block; /* Ensure the image behaves as a block element */
+      margin: 0 auto; /* Center the image horizontally */
+    }
+    .name-cell {
+      text-align: left; /* Align name to the left */
+      max-width: 180px; /* Limit the width of the cell */
+      overflow: hidden; /* Hide overflowed text */
+      text-overflow: ellipsis; /* Add ellipsis for overflowed text */
+      white-space: nowrap; /* Prevent text wrapping */
+      padding-left: 10px; /* Optional: Add padding for better spacing */
+    }
+    .race-column {
+  width: 30px; /* Narrow width for race column */
+  text-align: center; /* Center align the content of the column */
+}
+
+.rank-column, .score-column {
+  width: 30px; /* Narrow width for rank and score columns */
+  text-align: center; /* Center align the content of the columns */
+}
+    tr {
+      height: 50px; /* Fixed height for all rows */
+    }
   </style>
 </head>
 <body>
   <table id="leaderboard">
     <thead>
+      <tr>
+        <th class="rank-column">Rank</th> <!-- Fixed width for rank column -->
+        <th class="race-column">Race</th> <!-- Fixed width for race column -->
+        <th class="name-cell">Name</th> <!-- Fixed width for name column and nowrap -->
+        <th class="score-column">Score</th> <!-- Fixed width for score column -->
+      </tr>
     </thead>
     <tbody id="leaderboard-body">
-      <!-- ข้อมูลอันดับจะถูกแสดงที่นี่ -->
+      <!-- Leaderboard data will be displayed here -->
     </tbody>
   </table>
 
   <script>
-    // JavaScript เพื่อดึงข้อมูลจาก Google Sheet
+    // JavaScript function to get race icon based on score
+    function getRaceIcon(race, score) {
+      let raceName = race;
+      let raceFileName;
+
+      // Determine the race name and file based on score
+      if (score >= 135) {
+        // Evolved race icon
+        switch (raceName) {
+          case 'Human':
+            raceName = 'Hero';
+            break;
+          case 'Elf':
+            raceName = 'High Elf';
+            break;
+          case 'Dwarf':
+            raceName = 'Dwarf King';
+            break;
+          case 'Angel':
+            raceName = 'Arc Angel';
+            break;
+          case 'Goblin':
+            raceName = 'Hobgoblin';
+            break;
+          case 'Fairy':
+            raceName = 'Fairy Queen';
+            break;
+          case 'Dryad':
+            raceName = 'Elder Dryad';
+            break;
+          case 'Dragon':
+            raceName = 'Elder Dragon';
+            break;
+          case 'Vampire':
+            raceName = 'Vampire Lord';
+            break;
+          case 'Werebeast':
+            raceName = 'Warlord Beast';
+            break;
+          case 'Mermaid':
+            raceName = 'Mermaid Queen';
+            break;
+          case 'Demon':
+            raceName = 'Demon Lord';
+            break;
+          case 'Slime':
+            raceName = 'Demon Slime';
+            break;
+          case 'Undead':
+            raceName = 'Lich';
+            break;
+          default:
+            raceName = race;
+            break;
+        }
+      }
+
+      // Convert the evolved or original race name to a filename
+      raceFileName = raceName.toLowerCase().replace(/ /g, '_');
+
+      return `<img src="https://meltopiaadventure.web.app/race/${raceFileName}.png" alt="${raceName} icon" class="race-icon">`;
+    }
+
+    // JavaScript to fetch data from Google Sheets and update leaderboard
     document.addEventListener('DOMContentLoaded', fetchLeaderboard);
-    
+
     // Fetch leaderboard data every 3 seconds
     setInterval(fetchLeaderboard, 3000);
 
@@ -75,10 +174,13 @@
           leaderboardBody.innerHTML = ""; // Clear previous data
           data.slice(0, 15).forEach((row, index) => { // Slice the data array to get the top 15
             const newRow = document.createElement('tr');
+            const raceIcon = row.race ? getRaceIcon(row.race, row.score) : ''; // Get race icon or empty if no race
+
             newRow.innerHTML = `
-              <td>${index + 1}</td>
-              <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${row.name}</td>
-              <td>${row.score}</td>
+              <td class="rank-column">${index + 1}</td>
+              <td class="race-column">${raceIcon}</td> <!-- Display race icon with fixed column width -->
+              <td class="name-cell">${row.name}</td> <!-- Align name to the left and handle overflow -->
+              <td class="score-column">${row.score}</td> <!-- Fixed width for score column -->
             `;
             leaderboardBody.appendChild(newRow);
           });
