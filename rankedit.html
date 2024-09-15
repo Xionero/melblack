@@ -68,14 +68,14 @@
       padding-left: 10px; /* Optional: Add padding for better spacing */
     }
     .race-column {
-  width: 30px; /* Narrow width for race column */
-  text-align: center; /* Center align the content of the column */
-}
+      width: 30px; /* Narrow width for race column */
+      text-align: center; /* Center align the content of the column */
+    }
 
-.rank-column, .score-column {
-  width: 30px; /* Narrow width for rank and score columns */
-  text-align: center; /* Center align the content of the columns */
-}
+    .rank-column, .score-column {
+      width: 30px; /* Narrow width for rank and score columns */
+      text-align: center; /* Center align the content of the columns */
+    }
     tr {
       height: 50px; /* Fixed height for all rows */
     }
@@ -97,12 +97,12 @@
   </table>
 
   <script>
-    // JavaScript function to get race icon based on score
+    // ฟังก์ชันเพื่อดึง race icon ตาม score
     function getRaceIcon(race, score) {
       let raceName = race;
       let raceFileName;
 
-      // Determine the race name and file based on score
+      // กำหนด race ตาม score
       if (score >= 135) {
         // Evolved race icon
         switch (raceName) {
@@ -154,39 +154,58 @@
         }
       }
 
-      // Convert the evolved or original race name to a filename
+      // แปลงชื่อ race เป็นชื่อไฟล์
       raceFileName = raceName.toLowerCase().replace(/ /g, '_');
 
       return `<img src="https://meltopiaadventure.web.app/race/${raceFileName}.png" alt="${raceName} icon" class="race-icon">`;
     }
 
-    // JavaScript to fetch data from Google Sheets and update leaderboard
-    document.addEventListener('DOMContentLoaded', fetchLeaderboard);
-
-    // Fetch leaderboard data every 3 seconds
-    setInterval(fetchLeaderboard, 3000);
-
-    function fetchLeaderboard() {
-      fetch('https://script.google.com/macros/s/AKfycbyV4sLLI5MaXa-4-Lg7j7DrUsyxmC0Y5n4GAD3xGkQar_Cvda3U1aymISjlopHGhWukZw/exec')
+    // ฟังก์ชันดึงข้อมูล race จาก datacard sheet
+    async function fetchRaceData() {
+      return fetch('https://script.google.com/macros/s/AKfycbx1piVKZij8VJnYzwDG03BCXQQX1sPlcWYcDFjpT9WiPJQROYGmKFGzhqRtDqy5E7CBkQ/exec') // แก้ไขด้วย URL ของคุณ
         .then(response => response.json())
         .then(data => {
-          const leaderboardBody = document.getElementById('leaderboard-body');
-          leaderboardBody.innerHTML = ""; // Clear previous data
-          data.slice(0, 15).forEach((row, index) => { // Slice the data array to get the top 15
-            const newRow = document.createElement('tr');
-            const raceIcon = row.race ? getRaceIcon(row.race, row.score) : ''; // Get race icon or empty if no race
-
-            newRow.innerHTML = `
-              <td class="rank-column">${index + 1}</td>
-              <td class="race-column">${raceIcon}</td> <!-- Display race icon with fixed column width -->
-              <td class="name-cell">${row.name}</td> <!-- Align name to the left and handle overflow -->
-              <td class="score-column">${row.score}</td> <!-- Fixed width for score column -->
-            `;
-            leaderboardBody.appendChild(newRow);
+          const raceMap = new Map();
+          data.forEach(row => {
+            const name = row.name;  // คอลัมน์ชื่อจาก citizen
+            const race = row.race;  // คอลัมน์ race จาก citizen
+            raceMap.set(name, race); // สร้าง Map ของชื่อกับ race
           });
-        })
-        .catch(error => console.error('เกิดข้อผิดพลาดในการดึงข้อมูล:', error));
+          return raceMap;
+        });
     }
+
+    // ฟังก์ชันดึงข้อมูล leaderboard พร้อมข้อมูล race
+    function fetchLeaderboardWithRace() {
+      Promise.all([
+        fetch('https://script.google.com/macros/s/AKfycbyV4sLLI5MaXa-4-Lg7j7DrUsyxmC0Y5n4GAD3xGkQar_Cvda3U1aymISjlopHGhWukZw/exec').then(res => res.json()), // แก้ไขด้วย URL ของคุณ
+        fetchRaceData() // ดึงข้อมูล race จาก citizen
+      ]).then(([leaderboardData, raceMap]) => {
+        const leaderboardBody = document.getElementById('leaderboard-body');
+        leaderboardBody.innerHTML = ""; // เคลียร์ข้อมูลเก่า
+
+        leaderboardData.slice(0, 15).forEach((row, index) => {
+          const name = row.name; // ชื่อใน leaderboard
+          const score = row.score; // คะแนนใน leaderboard
+          const race = raceMap.get(name) || ''; // ดึงข้อมูล race จาก citizen หากไม่มีให้เป็นค่าว่าง
+          const raceIcon = race ? getRaceIcon(race, score) : ''; // แสดง race icon
+
+          const newRow = document.createElement('tr');
+          newRow.innerHTML = `
+            <td class="rank-column">${index + 1}</td>
+            <td class="race-column">${raceIcon}</td> <!-- แสดงไอคอน race -->
+            <td class="name-cell">${name}</td> <!-- ชื่อ -->
+            <td class="score-column">${score}</td> <!-- คะแนน -->
+          `;
+          leaderboardBody.appendChild(newRow);
+        });
+      }).catch(error => console.error('เกิดข้อผิดพลาดในการดึงข้อมูล:', error));
+    }
+
+    // อัพเดต leaderboard ทุก 3 วินาที
+    setInterval(fetchLeaderboardWithRace, 3000);
+
+    document.addEventListener('DOMContentLoaded', fetchLeaderboardWithRace);
   </script>
 </body>
 </html>
