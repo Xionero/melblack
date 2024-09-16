@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Make</title>
+    <style>
+        body {
+            background-image: url('q&a/black.png');
+            background-size: cover;
+            color: #333;
+            font-family: 'Comic Neue', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        form {
+            max-width: 500px;
+            margin: auto;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        select, input, textarea {
+            font-size: 1.2em;
+            display: block;
+            margin: 10px 0;
+            width: calc(100% - 20px);
+        }
+
+        input[type="submit"] {
+            background-color: #f36542;
+            color: #fff;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        #demo, p {
+            margin-top: 20px;
+        }
+
+        .preview-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .preview-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .preview-container img {
+        width: 75px;
+        height: 100px;
+        margin-right: 15px;
+        border-radius: 5px;
+        border: 3px solid #000;
+        object-fit: cover;
+        margin-top: -20px;
+    }
+    </style>
+    <!-- CSS: Bootstrap v-5.3 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <form action="" method="post" onsubmit="return false;" accept-charset="UTF-8" autocomplete="off" name="datacard">
+        <input type="text" id="title" name="name" placeholder="ชื่อ Youtube ใช้เสมือน ID" required>
+        <br>
+        <input type="text" id="title" name="handlename" placeholder="ชื่อเล่นใช้แสดงไม่เกิน 20 อักษร" required maxlength="20">
+        <br>
+           <!-- เปลี่ยน input เป็น select -->
+           <select id="race" name="race" required>
+            <option value="" disabled selected>Race</option>
+            <option value="Human">Human</option>
+            <option value="Elf">Elf</option>
+            <option value="Dwarf">Dwarf</option>
+            <option value="Orc">Orc</option>
+            <option value="Goblin">Goblin</option>
+            <option value="Fairy">Fairy</option>
+            <option value="Dryad">Dryad</option>
+            <option value="Dragon">Dragon</option>   
+            <option value="Vampire">Vampire</option>
+            <option value="Werebeast">Werebeast</option>        
+            <option value="Mermaid">Mermaid</option>
+            <option value="Angel">Angel</option>
+            <option value="Demon">Demon</option>
+            <option value="Slime">Slime</option>
+            <option value="Undead">Undead</option>
+        </select>
+        <br>
+        <!-- เปลี่ยน input เป็น select -->
+        <select id="mainJob" name="Job" required>
+            <option value="" disabled selected>Class</option>
+            <option value="Archer">Archer</option>
+            <option value="Knight">Knight</option>
+            <option value="Lancer">Lancer</option>
+            <option value="Monk">Monk</option>
+            <option value="Necromancy">Necromancy</option>
+            <option value="Ninja">Ninja</option>
+            <option value="Paladin">Paladin</option>
+            <option value="Priest">Priest</option>
+            <option value="Samurai">Samurai</option>
+            <option value="Spell Blade">Spell Blade</option>
+            <option value="Sorcerer">Sorcerer</option>
+            <option value="Summoner">Summoner</option>
+            <option value="Tamer">Tamer</option>
+            <option value="Thief">Thief</option>
+            <option value="Time Mage">Time Mage</option>  
+            <option value="Warrior">Warrior</option>    
+            <option value="Wizard">Wizard</option>
+        </select>
+        <br>
+        <!-- เปลี่ยน input เป็น select -->
+        <select id="subJob" name="SubJob" required>
+            <option value="" disabled selected>Job</option>
+            <option value="Angler">Angler</option>
+            <option value="Alchemist">Alchemist</option>  
+            <option value="Architect">Architect</option>            
+            <option value="Archaeologist">Archaeologist</option>
+            <option value="Blacksmith">Blacksmith</option>
+            <option value="Botanist">Botanist</option>
+            <option value="Biologist">Biologist</option>
+            <option value="Bounty">Bounty</option>
+            <option value="Chef">Chef</option>
+            <option value="Circus">Circus</option>  
+            <option value="Detective">Detective</option>          
+            <option value="Ecologist">Ecologist</option>
+            <option value="Engineer">Engineer</option>
+            <option value="Geologist">Geologist</option>
+            <option value="Hunter">Hunter</option>
+            <option value="Library">Library</option>
+            <option value="Merchant">Merchant</option>
+            <option value="Navigator">Navigator</option>
+            <option value="Physician">Physician</option>
+            <option value="Pharmacy">Pharmacy</option>
+            <option value="Spy">Spy</option>   
+            <option value="Zookeeper">Zookeeper</option>   
+        </select>
+        <br>
+        <input type="text" id="answer" name="image" placeholder="ใส่ url รูปจะแสดงบน preview" required oninput="updatePreview()">
+        <br>
+        <input type="hidden" id="zeny" name="Zeny" value="0">
+
+        <!-- Preview Container -->
+        <div class="preview-container">
+            <img id="imagePreview" src="https://xionero.github.io/melblack/preview.jpg" alt="Image Preview">
+        </div>
+
+        <div class="text-center">
+            <input type="submit" value="ยืนยัน" onclick="submitForm()">
+        </div>
+        <!-- แสดงข้อความ -->
+        <p id="demo"></p>
+    </form>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzZs-SNT8i7b7OpYGR71E3h56oNprFsxq9A3cJs0f_bBG-ASTUW5OwN-GhCd3iMfNKlRg/exec';
+        const form = document.forms['datacard'];
+        const submitButton = form.querySelector('input[type="submit"]');
+        const imagePreview = document.getElementById('imagePreview');
+        const imageUrlField = document.getElementById('answer');
+
+        function updatePreview() {
+            const url = imageUrlField.value;
+            imagePreview.src = url || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeViKxAyvqTM5AUcLtccwdOYareVd_SlsQtQ&s';
+        }
+
+        function submitForm() {
+            submitButton.disabled = true;
+            setTimeout(() => {
+                submitButton.disabled = false;
+            }, 3000);
+
+            if (form.name.value && form.Job.value && form.SubJob.value && form.race.value && form.image.value) {
+                fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+                    .then(response => {
+                        form.reset();
+                        document.getElementById('demo').innerHTML = "ส่งเรียบร้อยแล้ว";
+                        imagePreview.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeViKxAyvqTM5AUcLtccwdOYareVd_SlsQtQ&s';
+                    })
+                    .catch(error => {
+                        console.error('Error!', error.message);
+                        document.getElementById('demo').innerHTML = "เกิดข้อผิดพลาดในการส่งข้อมูล";
+                    });
+            } else {
+                document.getElementById('demo').innerHTML = "กรุณากรอกข้อมูลให้ครบถ้วน";
+            }
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
