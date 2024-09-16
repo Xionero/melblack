@@ -74,9 +74,9 @@
         <input type="text" id="title" name="name" placeholder="ชื่อ Youtube ที่ใช้สำหรับ update ข้อมูล rank และ score" required>
         <br>
         <input type="text" id="title" name="handlename" placeholder="ชื่อ ที่จะแสดงบนการ์ด พยายามอย่าใส่เกิน 20 อักษร" required>
-        <br>     
-        <!-- เปลี่ยน input เป็น select -->
-        <select id="race" name="race" required>
+        <br>
+           <!-- เปลี่ยน input เป็น select -->
+           <select id="race" name="race" required>
             <option value="" disabled selected>Race</option>
             <option value="Human">Human</option>
             <option value="Elf">Elf</option>
@@ -96,11 +96,9 @@
         </select>
         <br>
         <!-- เปลี่ยน input เป็น select -->
-        <select id="class" name="class" required>
+        <select id="mainJob" name="Job" required>
             <option value="" disabled selected>Class</option>
             <option value="Archer">Archer</option>
-            <option value="Assassin">Knight</option>
-            <option value="Berseker">Knight</option>
             <option value="Knight">Knight</option>
             <option value="Lancer">Lancer</option>
             <option value="Monk">Monk</option>
@@ -120,7 +118,7 @@
         </select>
         <br>
         <!-- เปลี่ยน input เป็น select -->
-        <select id="job" name="job" required>
+        <select id="subJob" name="SubJob" required>
             <option value="" disabled selected>Job</option>
             <option value="Angler">Angler</option>
             <option value="Alchemist">Alchemist</option>  
@@ -146,9 +144,9 @@
             <option value="Zookeeper">Zookeeper</option>   
         </select>
         <br>
-        <input type="text" id="answer" name="image" placeholder="ใส่ URL ของรูปภาพ ถ้าใส่ถูกรูปจะแสดงบน Preview" required oninput="updatePreview()">
+        <input type="text" id="answer" name="image" placeholder="ใส่ url รูปจะแสดงบน preview" required oninput="updatePreview()">
         <br>
-        <input type="hidden" id="zeny" name="zeny" value="0">
+        <input type="hidden" id="zeny" name="Zeny" value="0">
 
         <!-- Preview Container -->
         <div class="preview-container">
@@ -163,7 +161,7 @@
     </form>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbx1piVKZij8VJnYzwDG03BCXQQX1sPlcWYcDFjpT9WiPJQROYGmKFGzhqRtDqy5E7CBkQ/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzZs-SNT8i7b7OpYGR71E3h56oNprFsxq9A3cJs0f_bBG-ASTUW5OwN-GhCd3iMfNKlRg/exec';
         const form = document.forms['datacard'];
         const submitButton = form.querySelector('input[type="submit"]');
         const imagePreview = document.getElementById('imagePreview');
@@ -180,7 +178,7 @@
                 submitButton.disabled = false;
             }, 3000);
 
-            if (form.name.value && form.class.value && form.job.value && form.race.value && form.image.value) {
+            if (form.name.value && form.Job.value && form.SubJob.value && form.race.value && form.image.value) {
                 fetch(scriptURL, { method: 'POST', body: new FormData(form) })
                     .then(response => {
                         form.reset();
