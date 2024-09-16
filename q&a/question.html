@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ส่งคำถาม</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&display=swap');
+
+        body {
+            background: url('https://example.com/cute-anime-background2.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+            font-family: 'Comic Neue', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        form::before {
+            content: "";
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 150px;
+            height: 150px;
+            background: url('https://example.com/cute-corner-decor.png') no-repeat center center;
+            background-size: contain;
+            opacity: 0.4;
+            z-index: 1;
+        }
+
+        form > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        label {
+            font-size: 1.3em;
+            display: block;
+            margin: 12px 0;
+            color: #666;
+        }
+
+        input, textarea {
+            font-size: 1.1em;
+            display: block;
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            background: #fff;
+            color: #555;
+            resize: none; /* Disable resizing */
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #aaa;
+        }
+
+        input[type="submit"] {
+            background-color: #ffb3b3;
+            color: #000;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #ff99a0;
+        }
+
+        #error-message {
+            color: red;
+        }
+
+        #demo {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <form action="" method="post" onsubmit="submitForm(); return false;" accept-charset="UTF-8" autocomplete="off" name="question">
+
+        <input type="text" id="sender" name="youtube_name" placeholder="ชื่อผู้ส่ง" required>
+        
+
+        <input type="text" id="title" name="anime_name" placeholder="ชื่อเรื่อง" required>
+        
+
+        <textarea id="question" name="ask" placeholder="ใส่คำถาม" rows="4" required></textarea>
+        
+
+        <textarea id="answer" name="answer" placeholder="ใส่คำตอบ" rows="4" required></textarea>
+        
+        <input type="submit" value="ส่ง">
+
+        <!-- Message Display -->
+        <p id="demo"></p>
+    </form>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby52PsZSoAQ19TT09lcyAfEBYDFzyH7HsA4WHD-XgAzrTvQlbgRSmgx7kSa_qk2ya6L/exec';
+        const form = document.forms['question'];
+    
+        function submitForm() {
+            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+                .then(response => {
+                    const message = "<div class='alert alert-primary' role='alert'><b>ส่งเรียบร้อยแล้ว </b></div>";
+                    document.getElementById("demo").innerHTML = message;
+                    
+                    // Preserve the values of sender and title fields
+                    const senderValue = form['youtube_name'].value;
+                    const titleValue = form['anime_name'].value;
+    
+                    form.reset();
+    
+                    // Restore the values of sender and title fields
+                    form['youtube_name'].value = senderValue;
+                    form['anime_name'].value = titleValue;
+    
+                    setTimeout(() => {
+                        document.getElementById("demo").innerHTML = '';
+                    }, 3000); // 3000 milliseconds = 3 seconds
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                });
+        }
+    </script>
+    
+</body>
+</html>
