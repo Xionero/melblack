@@ -218,31 +218,49 @@
         }
 
         function submitForm() {
-            submitButton.disabled = true;
-            setTimeout(() => {
-                submitButton.disabled = false;
-            }, 3000);
+    submitButton.disabled = true;
+    setTimeout(() => {
+        submitButton.disabled = false;
+    }, 3000);
 
-            // Check if required fields are filled
-            if (form.name.value) {
-                // Collect checked options
-                const checkedOptions = Array.from(document.querySelectorAll('input[name="changeOptions"]:checked')).map(el => el.id.replace('change', '').toLowerCase());
-                form.changeOptions.value = checkedOptions.join(',');
+    // Check if required fields are filled
+    if (form.name.value) {
+        // Collect checked options
+        const checkedOptions = Array.from(document.querySelectorAll('input[name="changeOptions"]:checked')).map(el => el.id.replace('change', '').toLowerCase());
+        form.changeOptions.value = checkedOptions.join(',');
 
-                fetch(scriptURL, { method: 'POST', body: new FormData(form) })
-                    .then(response => {
-                        form.reset();
-                        document.getElementById('demo').innerHTML = "ส่งเรียบร้อยแล้ว";
-                        imagePreview.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeViKxAyvqTM5AUcLtccwdOYareVd_SlsQtQ&s';
-                        handleCheckboxChange(); // Reset fields
-                    })
-                    .catch(error => {
-                        console.error('Error!', error.message);
-                        document.getElementById('demo').innerHTML = "เกิดข้อผิดพลาดในการส่งข้อมูล";
-                    });
-            } else {
-                document.getElementById('demo').innerHTML = "กรุณากรอกข้อมูลให้ครบถ้วน";
-            }
+        fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+            .then(response => {
+                // Preserve the name input field value
+                const youtubeName = form.name.value;
+                
+                // Clear input fields as needed
+                document.getElementById('nameDisplay').value = "";
+                document.getElementById('race').value = "";
+                document.getElementById('mainJob').value = "";
+                document.getElementById('subJob').value = "";
+                document.getElementById('imageUrl').value = "";
+                imagePreview.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeViKxAyvqTM5AUcLtccwdOYareVd_SlsQtQ&s';
+                
+                // Restore the name input field value
+                form.name.value = youtubeName;
+
+                document.getElementById('demo').innerHTML = "ส่งเสร็จแล้ว อาจใช้เวลาประมาน 1 นาทีในการอัพเดท";
+                
+                // Clear the success message after 3 seconds
+                setTimeout(() => {
+                    document.getElementById('demo').innerHTML = "";
+                }, 3000);
+                
+                handleCheckboxChange(); // Reset visibility of input fields
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                document.getElementById('demo').innerHTML = "เกิดข้อผิดพลาดในการส่งข้อมูล";
+            });
+    } else {
+        document.getElementById('demo').innerHTML = "กรุณากรอกข้อมูลให้ครบถ้วน";
+    }
         }
     </script>
 
