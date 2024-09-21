@@ -119,29 +119,34 @@
         const form = document.forms['question'];
     
         function submitForm() {
-            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-                .then(response => {
-                    const message = "<div class='alert alert-primary' role='alert'><b>ส่งเรียบร้อยแล้ว </b></div>";
-                    document.getElementById("demo").innerHTML = message;
-                    
-                    // Preserve the values of sender and title fields
-                    const senderValue = form['youtube_name'].value;
-                    const titleValue = form['anime_name'].value;
+    const confirmation = confirm("ยืนยันการส่งข้อมูลใช่หรือไม่?");
     
-                    form.reset();
-    
-                    // Restore the values of sender and title fields
-                    form['youtube_name'].value = senderValue;
-                    form['anime_name'].value = titleValue;
-    
-                    setTimeout(() => {
-                        document.getElementById("demo").innerHTML = '';
-                    }, 3000); // 3000 milliseconds = 3 seconds
-                })
-                .catch(error => {
-                    console.error('Error!', error.message);
-                });
-        }
+    if (confirmation) {
+        fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+            .then(response => {
+                const message = "<div class='alert alert-primary' role='alert'><b>ส่งเรียบร้อยแล้ว </b></div>";
+                document.getElementById("demo").innerHTML = message;
+
+                // Preserve the values of sender and title fields
+                const senderValue = form['youtube_name'].value;
+                const titleValue = form['anime_name'].value;
+
+                form.reset();
+
+                // Restore the values of sender and title fields
+                form['youtube_name'].value = senderValue;
+                form['anime_name'].value = titleValue;
+
+                setTimeout(() => {
+                    document.getElementById("demo").innerHTML = '';
+                }, 3000); // 3000 milliseconds = 3 seconds
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+            });
+    }
+}
+
     </script>
     
 </body>
