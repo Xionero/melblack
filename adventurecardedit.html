@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Card Edit</title>
     <style>
         body {
@@ -225,68 +227,87 @@
 
     // ตรวจสอบว่ามีการกรอกชื่อหรือไม่
     if (!nameField) {
-        alert("กรุณากรอกชื่อ");
         return;
     }
 
     // ตรวจสอบว่ามีการติ๊กเช็คบ็อกซ์หรือไม่
     if (!isNameDisplayChecked && !isImageChecked) {
-        alert("กรุณาเลือกการแก้ไข");
+        Swal.fire({
+            icon: 'warning',
+            title: 'กรุณาเลือกการแก้ไขอย่างน้อยหนึ่งรายการ',
+        });
         return;
     }
 
-    // ตรวจสอบว่ามีการกรอกข้อมูลในช่องที่เกี่ยวข้องหรือไม่
+    // ตรวจสอบว่ามีการกรอกข้อมูลในช่องที่เกี่ยวข้องหรือไม่สำหรับการเปลี่ยนชื่อ
     if (isNameDisplayChecked && !document.getElementById('nameDisplay').value.trim()) {
-        alert("กรุณากรอกชื่อเล่น");
         return;
     }
     
+    // ตรวจสอบว่ามีการกรอกข้อมูลในช่อง URL รูปภาพหรือไม่
     if (isImageChecked && !document.getElementById('imageUrl').value.trim()) {
-        alert("กรุณากรอก URL ของรูปภาพ");
+        Swal.fire({
+            icon: 'warning',
+            title: 'กรุณากรอก URL ของรูปภาพ',
+        });
         return;
     }
 
     // หากผ่านการตรวจสอบทั้งหมด สามารถส่งฟอร์มได้
-    const confirmation = confirm("ยืนยันการส่งแก้ไข?");
-    if (confirmation) {
-        submitButton.disabled = true;
-        setTimeout(() => {
-            submitButton.disabled = false;
-        }, 3000);
+    Swal.fire({
+        title: 'ยืนยันการส่งแก้ไข?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            submitButton.disabled = true;
+            setTimeout(() => {
+                submitButton.disabled = false;
+            }, 3000);
 
-        const checkedOptions = Array.from(document.querySelectorAll('input[name="changeOptions"]:checked'))
-            .map(el => el.id.replace('change', '').toLowerCase());
-        form.changeOptions.value = checkedOptions.join(',');
+            const checkedOptions = Array.from(document.querySelectorAll('input[name="changeOptions"]:checked'))
+                .map(el => el.id.replace('change', '').toLowerCase());
+            form.changeOptions.value = checkedOptions.join(',');
 
-        fetch(scriptURL, { method: 'POST', body: new FormData(form) })
-            .then(response => {
-                if (response.ok) {
-                    const youtubeName = form.name.value;
+            fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+                .then(response => {
+                    if (response.ok) {
+                        const youtubeName = form.name.value;
 
-                    document.getElementById('nameDisplay').value = "";
-                    document.getElementById('race').value = "";
-                    document.getElementById('mainJob').value = "";
-                    document.getElementById('subJob').value = "";
-                    document.getElementById('imageUrl').value = "";
+                        // Reset form fields
+                        document.getElementById('nameDisplay').value = "";
+                        document.getElementById('race').value = "";
+                        document.getElementById('mainJob').value = "";
+                        document.getElementById('subJob').value = "";
+                        document.getElementById('imageUrl').value = "";
 
-                    form.name.value = youtubeName;
+                        form.name.value = youtubeName;
 
-                    document.getElementById('demo').innerHTML = "ส่งเสร็จแล้ว อาจใช้เวลาประมาน 1 นาทีในการอัพเดท";
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ส่งเสร็จแล้ว',
+                            text: 'อาจใช้เวลาประมาน 1 นาทีในการอัพเดท',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
 
-                    setTimeout(() => {
-                        document.getElementById('demo').innerHTML = "";
-                    }, 3000);
-
-                    handleCheckboxChange();
-                } else {
-                    throw new Error('เกิดข้อผิดพลาดในการส่งข้อมูล');
-                }
-            })
-            .catch(error => {
-                console.error('Error!', error.message);
-                document.getElementById('demo').innerHTML = "เกิดข้อผิดพลาดในการส่งข้อมูล";
-            });
-    }
+                        handleCheckboxChange();
+                    } else {
+                        throw new Error('เกิดข้อผิดพลาดในการส่งข้อมูล');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาดในการส่งข้อมูล',
+                        text: error.message
+                    });
+                });
+        }
+    });
 }
 
     </script>
