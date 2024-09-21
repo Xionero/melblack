@@ -86,9 +86,9 @@
     <thead>
       <tr>
         <th class="race-column">Race</th> <!-- Fixed width for race column -->
+        <th class="rank-column">Ar</th> <!-- คอลัมน์ RankExp -->
         <th class="name-cell">Name</th> <!-- Updated column header -->
         <th class="score-column">Score</th> <!-- Fixed width for score column -->
-        <th class="rank-column">Ar</th> <!-- คอลัมน์ RankExp -->
       </tr>
     </thead>
     <tbody id="leaderboard-body">
@@ -200,9 +200,9 @@
                 const newRow = document.createElement('tr');
                 newRow.innerHTML = `
                     <td class="race-column">${raceIcon}</td> <!-- แสดงไอคอน race -->
+                    <td class="rank-column">${calculateRank(rankTotal)}</td> <!-- แสดง rank ในรูปแบบตัวอักษร -->
                     <td class="name-cell">${handlename}</td> <!-- ชื่อ -->
                     <td class="score-column">${score}</td> <!-- คะแนน -->
-                    <td class="rank-column">${calculateRank(rankTotal)}</td> <!-- แสดง rank ในรูปแบบตัวอักษร -->
                 `;
                 leaderboardBody.appendChild(newRow);
             });
