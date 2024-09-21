@@ -176,7 +176,7 @@
             <option value="Spy">Spy</option>
             <option value="Zookeeper">Zookeeper</option>
         </select>
-        <input type="text" id="imageUrl" class="hidden" name="image" placeholder="ใส่ URL ของรูปภาพ ถ้าใส่ถูกรูปจะแสดงบน Preview" oninput="updatePreview()">
+        <input type="text" id="imageUrl" class="hidden" name="image" placeholder="ใส่ url รูปจะแสดงบน preview" required oninput="updatePreview()">
         
         <!-- Preview Container -->
         <div class="preview-container hidden" id="imagePreviewContainer">
@@ -246,10 +246,6 @@
     
     // ตรวจสอบว่ามีการกรอกข้อมูลในช่อง URL รูปภาพหรือไม่
     if (isImageChecked && !document.getElementById('imageUrl').value.trim()) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'กรุณากรอก URL ของรูปภาพ',
-        });
         return;
     }
 
