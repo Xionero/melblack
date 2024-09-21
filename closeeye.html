@@ -156,19 +156,24 @@
         }
 
         function submitForm() {
-            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-                .then(response => {
-                    const message = "<div class='alert alert-primary' role='alert'><b>ส่งเรียบร้อยแล้ว </b></div>";
-                    document.getElementById("demo").innerHTML = message;
-                    form.reset();
-                    setTimeout(() => {
-                        document.getElementById("demo").innerHTML = '';
-                    }, 3000); // 3000 milliseconds = 3 seconds
-                })
-                .catch(error => {
-                    console.error('Error!', error.message);
-                });
-        }
+    const confirmation = confirm("ยืนยันการส่งหรือไม่?");
+    
+    if (confirmation) {
+        fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+            .then(response => {
+                const message = "<div class='alert alert-primary' role='alert'><b>ส่งเรียบร้อยแล้ว </b></div>";
+                document.getElementById("demo").innerHTML = message;
+                form.reset();
+                setTimeout(() => {
+                    document.getElementById("demo").innerHTML = '';
+                }, 3000); // 3000 milliseconds = 3 seconds
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+            });
+    }
+}
+
     </script>
 </body>
 </html>
