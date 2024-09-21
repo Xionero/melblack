@@ -139,53 +139,57 @@
     </form>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxGTVsvp_JrcZCZrmobPbvdj5wIXuvHpkSQ1yaa9qY7Mfpj1r2d3Hbt0kURsDGHs47JtA/exec';
-        const form = document.forms['question'];
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxGTVsvp_JrcZCZrmobPbvdj5wIXuvHpkSQ1yaa9qY7Mfpj1r2d3Hbt0kURsDGHs47JtA/exec';
+    const form = document.forms['question'];
 
-        function validateAndSubmitForm(event) {
-            event.preventDefault();
-            const answer1 = document.getElementById('answer1').value.trim();
-            const answer2 = document.getElementById('answer2').value.trim();
-            const answer3 = document.getElementById('answer3').value.trim();
-            const answer4 = document.getElementById('answer4').value.trim();
+    function validateAndSubmitForm(event) {
+        event.preventDefault();
+        const answer1 = document.getElementById('answer1').value.trim();
+        const answer2 = document.getElementById('answer2').value.trim();
+        const answer3 = document.getElementById('answer3').value.trim();
+        const answer4 = document.getElementById('answer4').value.trim();
 
-            if (answer1 === '' && answer2 === '' && answer3 === '' && answer4 === '') {
-                alert('กรุณาตอบคำถามอย่างน้อยหนึ่งข้อ');
-                return false;
+        if (answer1 === '' && answer2 === '' && answer3 === '' && answer4 === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'กรุณาตอบคำถามอย่างน้อยหนึ่งข้อ',
+            });
+            return false;
+        }
+
+        submitForm();
+    }
+
+    function submitForm() {
+        Swal.fire({
+            title: 'ยืนยันการส่งหรือไม่?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยัน',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+                    .then(response => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ส่งเรียบร้อยแล้ว',
+                            showConfirmButton: false,
+                            timer: 3000 // แสดงผลเป็นเวลา 3 วินาที
+                        });
+                        form.reset();
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด',
+                            text: error.message
+                        });
+                    });
             }
-
-            submitForm();
-        }
-
-        function submitForm() {
-    Swal.fire({
-        title: 'ยืนยันการส่งหรือไม่?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'ยืนยัน',
-        cancelButtonText: 'ยกเลิก'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(scriptURL, { method: 'POST', body: new FormData(form) })
-                .then(response => {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'ส่งเรียบร้อยแล้ว',
-                        showConfirmButton: false,
-                        timer: 3000 // แสดงผลเป็นเวลา 3 วินาที
-                    });
-                    form.reset();
-                })
-                .catch(error => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'เกิดข้อผิดพลาด',
-                        text: error.message
-                    });
-                });
-        }
-    });
-}
+        });
+    }
+</script>
 
     </script>
 </body>
