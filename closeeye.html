@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Close Eye</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&display=swap');
 
@@ -156,22 +158,33 @@
         }
 
         function submitForm() {
-    const confirmation = confirm("ยืนยันการส่งหรือไม่?");
-    
-    if (confirmation) {
-        fetch(scriptURL, { method: 'POST', body: new FormData(form) })
-            .then(response => {
-                const message = "<div class='alert alert-primary' role='alert'><b>ส่งเรียบร้อยแล้ว </b></div>";
-                document.getElementById("demo").innerHTML = message;
-                form.reset();
-                setTimeout(() => {
-                    document.getElementById("demo").innerHTML = '';
-                }, 3000); // 3000 milliseconds = 3 seconds
-            })
-            .catch(error => {
-                console.error('Error!', error.message);
-            });
-    }
+    Swal.fire({
+        title: 'ยืนยันการส่งหรือไม่?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+                .then(response => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ส่งเรียบร้อยแล้ว',
+                        showConfirmButton: false,
+                        timer: 3000 // แสดงผลเป็นเวลา 3 วินาที
+                    });
+                    form.reset();
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: error.message
+                    });
+                });
+        }
+    });
 }
 
     </script>
