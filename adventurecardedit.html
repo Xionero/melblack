@@ -194,16 +194,14 @@
         const imagePreview = document.getElementById('imagePreview');
         const imageUrlField = document.getElementById('imageUrl');
         const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-
+    
         function handleCheckboxChange() {
-            // Get the state of each checkbox
             const isNameDisplayChecked = document.getElementById('changeNameDisplay').checked;
             const isRaceChecked = document.getElementById('changeRace').checked;
             const isMainJobChecked = document.getElementById('changeMainJob').checked;
             const isSubJobChecked = document.getElementById('changeSubJob').checked;
             const isImageChecked = document.getElementById('changeImage').checked;
-
-            // Show or hide input fields based on checkbox selection
+    
             document.getElementById('nameDisplay').classList.toggle('hidden', !isNameDisplayChecked);
             document.getElementById('race').classList.toggle('hidden', !isRaceChecked);
             document.getElementById('mainJob').classList.toggle('hidden', !isMainJobChecked);
@@ -211,61 +209,86 @@
             document.getElementById('imageUrl').classList.toggle('hidden', !isImageChecked);
             imagePreviewContainer.classList.toggle('hidden', !isImageChecked);
         }
-
+    
         function updatePreview() {
             const url = imageUrlField.value;
             imagePreview.src = url || 'https://xionero.github.io/melblack/preview.jpg';
+            imagePreview.onerror = function() {
+                imagePreview.src = 'https://xionero.github.io/melblack/preview.jpg'; // รูป placeholder
+            };
         }
-
+    
         function submitForm() {
-    submitButton.disabled = true;
-    setTimeout(() => {
-        submitButton.disabled = false;
-    }, 3000);
+    const nameField = document.getElementById('youtubeName').value.trim();
+    const isNameDisplayChecked = document.getElementById('changeNameDisplay').checked;
+    const isImageChecked = document.getElementById('changeImage').checked;
 
-    // Check if required fields are filled
-    if (form.name.value) {
-        // Collect checked options
-        const checkedOptions = Array.from(document.querySelectorAll('input[name="changeOptions"]:checked')).map(el => el.id.replace('change', '').toLowerCase());
+    // ตรวจสอบว่ามีการกรอกชื่อหรือไม่
+    if (!nameField) {
+        alert("กรุณากรอกชื่อ");
+        return;
+    }
+
+    // ตรวจสอบว่ามีการติ๊กเช็คบ็อกซ์หรือไม่
+    if (!isNameDisplayChecked && !isImageChecked) {
+        alert("กรุณาเลือกการแก้ไข");
+        return;
+    }
+
+    // ตรวจสอบว่ามีการกรอกข้อมูลในช่องที่เกี่ยวข้องหรือไม่
+    if (isNameDisplayChecked && !document.getElementById('nameDisplay').value.trim()) {
+        alert("กรุณากรอกชื่อเล่น");
+        return;
+    }
+    
+    if (isImageChecked && !document.getElementById('imageUrl').value.trim()) {
+        alert("กรุณากรอก URL ของรูปภาพ");
+        return;
+    }
+
+    // หากผ่านการตรวจสอบทั้งหมด สามารถส่งฟอร์มได้
+    const confirmation = confirm("ยืนยันการส่งแก้ไข?");
+    if (confirmation) {
+        submitButton.disabled = true;
+        setTimeout(() => {
+            submitButton.disabled = false;
+        }, 3000);
+
+        const checkedOptions = Array.from(document.querySelectorAll('input[name="changeOptions"]:checked'))
+            .map(el => el.id.replace('change', '').toLowerCase());
         form.changeOptions.value = checkedOptions.join(',');
 
         fetch(scriptURL, { method: 'POST', body: new FormData(form) })
             .then(response => {
-                // Preserve the name input field value
-                const youtubeName = form.name.value;
-                
-                // Clear input fields as needed
-                document.getElementById('nameDisplay').value = "";
-                document.getElementById('race').value = "";
-                document.getElementById('mainJob').value = "";
-                document.getElementById('subJob').value = "";
-                document.getElementById('imageUrl').value = "";
-                imagePreview.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeViKxAyvqTM5AUcLtccwdOYareVd_SlsQtQ&s';
-                
-                // Restore the name input field value
-                form.name.value = youtubeName;
+                if (response.ok) {
+                    const youtubeName = form.name.value;
 
-                document.getElementById('demo').innerHTML = "ส่งเสร็จแล้ว อาจใช้เวลาประมาน 1 นาทีในการอัพเดท";
-                
-                // Clear the success message after 3 seconds
-                setTimeout(() => {
-                    document.getElementById('demo').innerHTML = "";
-                }, 3000);
-                
-                handleCheckboxChange(); // Reset visibility of input fields
+                    document.getElementById('nameDisplay').value = "";
+                    document.getElementById('race').value = "";
+                    document.getElementById('mainJob').value = "";
+                    document.getElementById('subJob').value = "";
+                    document.getElementById('imageUrl').value = "";
+
+                    form.name.value = youtubeName;
+
+                    document.getElementById('demo').innerHTML = "ส่งเสร็จแล้ว อาจใช้เวลาประมาน 1 นาทีในการอัพเดท";
+
+                    setTimeout(() => {
+                        document.getElementById('demo').innerHTML = "";
+                    }, 3000);
+
+                    handleCheckboxChange();
+                } else {
+                    throw new Error('เกิดข้อผิดพลาดในการส่งข้อมูล');
+                }
             })
             .catch(error => {
                 console.error('Error!', error.message);
                 document.getElementById('demo').innerHTML = "เกิดข้อผิดพลาดในการส่งข้อมูล";
             });
-    } else {
-        document.getElementById('demo').innerHTML = "กรุณากรอกข้อมูลให้ครบถ้วน";
     }
-        }
-    </script>
+}
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    </script>
 </body>
 </html>
