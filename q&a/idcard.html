@@ -488,14 +488,6 @@
     if (rankexp >= 25) return '<span style="color: brown; -webkit-text-stroke: 0.3px rgb(0, 0, 0);">F</span>';     // Brown for F rank
     return '<span style="color: gray; -webkit-text-stroke: 0.3px rgb(0, 0, 0);">G</span>';                         // Gray for G rank
 }
-
-  function resizeIframe() {
-    const height = document.body.scrollHeight; // รับความสูงของเนื้อหา
-    window.parent.postMessage(height, '*'); // ส่งค่าความสูงกลับไปยัง parent
-  }
-
-  window.onload = resizeIframe; // เรียกฟังก์ชันเมื่อโหลดหน้าเสร็จ
-  window.onresize = resizeIframe; // เรียกฟังก์ชันเมื่อปรับขนาดหน้าต่าง
   </script>
 </body>
 </html>
