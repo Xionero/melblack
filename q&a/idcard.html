@@ -189,7 +189,7 @@
     setInterval(fetchLeaderboard, 3000);
 
     function fetchLeaderboard() {
-      fetch('https://script.google.com/macros/s/AKfycbxBShxdgie2wmbWPWEkq5DntfNZcZP_uGVDO1eNHVQRyrXjLyquCF5GphhuorYTPXYE2A/exec')
+      fetch('https://script.google.com/macros/s/AKfycbx67k-Ev63AZys0sKJgiqWVacanih7jSod_BVfVAQ4OcWZNHnB_DslQBLepEF8rbrbulw/exec')
         .then(response => response.json())
         .then(data => {
           const leaderboard = document.getElementById('leaderboard');
