@@ -71,9 +71,7 @@
 <body>
     <form action="" method="post" onsubmit="return false;" accept-charset="UTF-8" autocomplete="off" name="datacard">
         <input type="text" id="title" name="name" placeholder="ชื่อ Youtube ใช้เสมือน ID" required>
-        <br>
         <input type="text" id="title" name="handlename" placeholder="ชื่อเล่นใช้แสดงไม่เกิน 20 อักษร" required maxlength="20">
-        <br>
            <!-- เปลี่ยน input เป็น select -->
            <select id="race" name="race" required>
             <option value="" disabled selected>Race</option>
@@ -93,7 +91,6 @@
             <option value="Slime">Slime</option>
             <option value="Undead">Undead</option>
         </select>
-        <br>
         <!-- เปลี่ยน input เป็น select -->
         <select id="mainJob" name="class" required>
             <option value="" disabled selected>Class</option>
@@ -117,7 +114,6 @@
             <option value="Warrior">Warrior</option>    
             <option value="Wizard">Wizard</option>
         </select>
-        <br>
         <!-- เปลี่ยน input เป็น select -->
         <select id="subJob" name="job" required>
             <option value="" disabled selected>Job</option>
@@ -144,7 +140,6 @@
             <option value="Spy">Spy</option>   
             <option value="Zookeeper">Zookeeper</option>   
         </select>
-        <br>
         <input type="text" id="answer" name="image" placeholder="ใส่ url รูปจะแสดงบน preview" required oninput="updatePreview()">
         <br>
         <input type="hidden" id="exp" name="exp" value="0">
