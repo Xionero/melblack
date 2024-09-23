@@ -175,11 +175,11 @@
             <option value="Zookeeper">Zookeeper</option>
         </select>
         
-        <input type="text" id="imageUrl" name="image" placeholder="ใส่ url รูปจะแสดงบน preview" required oninput="updatePreview()">
+        <input type="text" id="imageUrl" name="image" placeholder="ใส่ url รูปจะแสดงบน preview" required oninput="updatePreview()" class="hidden">
 
         <!-- Preview Container -->
         <div class="preview-container hidden" id="imagePreviewContainer">
-            <img id="imagePreview" src="https://xionero.github.io/melblack/preview.jpg" alt="Image Preview">
+            <img id="imagePreview" src="https://xionero.github.io/melblack/preview.jpg" alt="Image Preview" onerror="this.src='https://xionero.github.io/melblack/preview.jpg';">
         </div>
         
         <div class="text-center">
