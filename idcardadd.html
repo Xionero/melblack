@@ -140,7 +140,7 @@
             <option value="Spy">Spy</option>   
             <option value="Zookeeper">Zookeeper</option>   
         </select>
-        <input type="text" id="answer" name="image" placeholder="ใส่ url รูปจะแสดงบน preview">
+        <input type="text" id="answer" name="image" placeholder="ใส่ url รูปจะแสดงบน preview" required oninput="updatePreview()">
         <br>
         <input type="hidden" id="exp" name="exp" value="0">
         <br>
@@ -150,7 +150,7 @@
 
         <!-- Preview Container -->
         <div class="preview-container">
-            <img id="imagePreview" src="https://xionero.github.io/melblack/preview.jpg" alt="Image Preview">
+            <img id="imagePreview" src="https://xionero.github.io/melblack/preview.jpg">
         </div>
 
         <div class="text-center">
@@ -161,6 +161,12 @@
     </form>
 
     <script>
+        function updatePreview() {
+            const url = imageUrlField.value;
+            imagePreview.src = url || 'https://xionero.github.io/melblack/preview.jpg';
+        }
+
+
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzZs-SNT8i7b7OpYGR71E3h56oNprFsxq9A3cJs0f_bBG-ASTUW5OwN-GhCd3iMfNKlRg/exec';
         const form = document.forms['datacard'];
         const submitButton = form.querySelector('input[type="submit"]');
