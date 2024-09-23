@@ -140,14 +140,14 @@
             <option value="Spy">Spy</option>   
             <option value="Zookeeper">Zookeeper</option>   
         </select>
-        <input type="text" id="answer" name="image" placeholder="ใส่ url รูปจะแสดงบน preview" required oninput="updatePreview()">
-       
-        <input type="hidden" id="exp" name="exp" value="0">
-
-        <input type="hidden" id="exp" name="rankexp" value="0">
-
-        <input type="hidden" id="zeny" name="zeny" value="0">
+        <input type="text" id="answer" name="image" placeholder="ใส่ url รูปจะแสดงบน preview">
         <br>
+        <input type="hidden" id="exp" name="exp" value="0">
+        <br>
+        <input type="hidden" id="exp" name="rankexp" value="0">
+        <br>
+        <input type="hidden" id="zeny" name="zeny" value="0">
+
         <!-- Preview Container -->
         <div class="preview-container">
             <img id="imagePreview" src="https://xionero.github.io/melblack/preview.jpg" alt="Image Preview">
@@ -167,11 +167,6 @@
         const imagePreview = document.getElementById('imagePreview');
         const imageUrlField = document.getElementById('answer');
 
-        function updatePreview() {
-            const url = imageUrlField.value;
-            imagePreview.src = url || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeViKxAyvqTM5AUcLtccwdOYareVd_SlsQtQ&s';
-        }
-
         function submitForm() {
     if (form.name.value && form.class.value && form.job.value && form.race.value && form.image.value) {
         Swal.fire({
@@ -182,7 +177,8 @@
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'ยืนยัน',
-            cancelButtonText: 'ยกเลิก'
+            cancelButtonText: 'ยกเลิก',
+            reverseButtons: true // สลับตำแหน่งของปุ่ม
         }).then((result) => {
             if (result.isConfirmed) {
                 submitButton.disabled = true;
@@ -193,19 +189,40 @@
                 fetch(scriptURL, { method: 'POST', body: new FormData(form) })
                     .then(response => {
                         form.reset();
-                        document.getElementById('demo').innerHTML = "ส่งเรียบร้อยแล้ว";
-                        imagePreview.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeViKxAyvqTM5AUcLtccwdOYareVd_SlsQtQ&s';
+                        imagePreview.src = 'https://xionero.github.io/melblack/preview.jpg';
+
+                        // แจ้งเตือนเมื่อส่งข้อมูลสำเร็จ
+                        Swal.fire({
+                            title: 'ส่งข้อมูลสำเร็จ!',
+                            text: 'ข้อมูลของคุณถูกส่งเรียบร้อยแล้ว',
+                            icon: 'success',
+                            confirmButtonText: 'ตกลง'
+                        });
                     })
                     .catch(error => {
                         console.error('Error!', error.message);
                         document.getElementById('demo').innerHTML = "เกิดข้อผิดพลาดในการส่งข้อมูล";
+
+                        // แจ้งเตือนเมื่อเกิดข้อผิดพลาดในการส่งข้อมูล
+                        Swal.fire({
+                            title: 'เกิดข้อผิดพลาด!',
+                            text: 'ไม่สามารถส่งข้อมูลได้',
+                            icon: 'error',
+                            confirmButtonText: 'ตกลง'
+                        });
                     });
             }
         });
     } else {
+        // สามารถเพิ่มการแจ้งเตือนเมื่อข้อมูลไม่ครบได้หากต้องการ
+        Swal.fire({
+            title: 'ข้อมูลไม่ครบถ้วน',
+            text: 'กรุณากรอกข้อมูลให้ครบทุกช่อง',
+            icon: 'warning',
+            confirmButtonText: 'ตกลง'
+        });
     }
 }
-
     </script>
 </body>
 </html>
