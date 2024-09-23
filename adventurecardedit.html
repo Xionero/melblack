@@ -174,8 +174,9 @@
             <option value="Spy">Spy</option>
             <option value="Zookeeper">Zookeeper</option>
         </select>
-        <input type="text" id="imageUrl" class="hidden" name="image" placeholder="ใส่ url รูปจะแสดงบน preview" required oninput="updatePreview()">
         
+        <input type="text" id="imageUrl" name="image" placeholder="ใส่ url รูปจะแสดงบน preview" required oninput="updatePreview()">
+
         <!-- Preview Container -->
         <div class="preview-container hidden" id="imagePreviewContainer">
             <img id="imagePreview" src="https://xionero.github.io/melblack/preview.jpg" alt="Image Preview">
@@ -193,7 +194,8 @@
         const submitButton = form.querySelector('input[type="submit"]');
         const imagePreview = document.getElementById('imagePreview');
         const imageUrlField = document.getElementById('imageUrl');
-        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+
+    
     
         function handleCheckboxChange() {
             const isNameDisplayChecked = document.getElementById('changeNameDisplay').checked;
@@ -212,10 +214,7 @@
     
         function updatePreview() {
             const url = imageUrlField.value;
-            imagePreview.src = url || 'https://xionero.github.io/melblack/preview.jpg';
-            imagePreview.onerror = function() {
-                imagePreview.src = 'https://xionero.github.io/melblack/preview.jpg'; // รูป placeholder
-            };
+            imagePreview.src = url || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeViKxAyvqTM5AUcLtccwdOYareVd_SlsQtQ&s';
         }
     
         function submitForm() {
