@@ -71,7 +71,6 @@
       width: 30px; /* Narrow width for race column */
       text-align: center; /* Center align the content of the column */
     }
-
     .rank-column, .score-column {
       width: 30px; /* Narrow width for rank and score columns */
       text-align: center; /* Center align the content of the columns */
@@ -85,10 +84,10 @@
   <table id="leaderboard">
     <thead>
       <tr>
-        <th class="race-column">Race</th> <!-- Fixed width for race column -->
-        <th class="rank-column">Ar</th> <!-- คอลัมน์ RankExp -->
-        <th class="name-cell">Name</th> <!-- Updated column header -->
-        <th class="score-column">Score</th> <!-- Fixed width for score column -->
+        <th class="race-column">Race</th> <!-- Race Column -->
+        <th class="rank-column">Ar</th> <!-- Rank Column -->
+        <th class="name-cell">Name</th> <!-- Name Column -->
+        <th class="score-column">Score</th> <!-- Score Column -->
       </tr>
     </thead>
     <tbody id="leaderboard-body">
@@ -161,23 +160,29 @@
     }
 
     // ฟังก์ชันดึงข้อมูล race จาก datacard sheet
-    async function fetchRaceData() {
-      return fetch('https://script.google.com/macros/s/AKfycbzZs-SNT8i7b7OpYGR71E3h56oNprFsxq9A3cJs0f_bBG-ASTUW5OwN-GhCd3iMfNKlRg/exec') // แก้ไขด้วย URL ของคุณ
-        .then(response => response.json())
-        .then(data => {
-          const raceMap = new Map();
-          const nameMap = new Map(); // ใหม่: Map สำหรับชื่อ
-          data.forEach(row => {
-            const handlename = row.handlename;  // คอลัมน์ handlename จาก citizen
-            const race = row.race;  // คอลัมน์ race จาก citizen
-            if (handlename) {
-              nameMap.set(row.name, handlename); // สร้าง Map ของชื่อที่มี handlename
+   async function fetchRaceData() {
+    return fetch('https://script.google.com/macros/s/AKfycbzZs-SNT8i7b7OpYGR71E3h56oNprFsxq9A3cJs0f_bBG-ASTUW5OwN-GhCd3iMfNKlRg/exec')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
             }
-            raceMap.set(handlename, race); // สร้าง Map ของ handlename กับ race
-          });
-          return { raceMap, nameMap }; // ส่งกลับทั้ง raceMap และ nameMap
-        });
-    }
+            return response.json();
+        })
+        .then(data => {
+            const raceMap = new Map();
+            const nameMap = new Map();
+            data.forEach(row => {
+                const handlename = row.handlename;
+                const race = row.race;
+                if (handlename) {
+                    nameMap.set(row.name, handlename);
+                }
+                raceMap.set(handlename, race);
+            });
+            return { raceMap, nameMap };
+        })
+        .catch(error => console.error('Error fetching race data:', error));
+}
 
     // ฟังก์ชันดึงข้อมูล leaderboard พร้อมข้อมูล race
     function fetchLeaderboardWithRace() {
@@ -209,7 +214,11 @@
         }).catch(error => console.error('เกิดข้อผิดพลาด:', error));
     }
 
-    fetchLeaderboardWithRace(); // เรียกฟังก์ชันเมื่อโหลดหน้า
+    // เรียกฟังก์ชันเมื่อโหลดหน้า
+    fetchLeaderboardWithRace();
+    
+    // Polling for real-time updates
+    setInterval(fetchLeaderboardWithRace, 10000); // Update every 10 seconds
 
     function calculateRank(rankexp) {
         let rankLetter = '';
