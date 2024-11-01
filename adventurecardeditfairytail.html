@@ -224,41 +224,52 @@
     </form>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzY7lRyJxEBWV3dGU9D6uOoW8e8d5gGYDoinvuOzeucIkIRLevj9jU7q72mla5iQPMffg/exec';
-        const form = document.forms['datacard'];
-        const submitButton = form.querySelector('input[type="submit"]');
-        const imagePreview = document.getElementById('imagePreview');
-        const imageUrlField = document.getElementById('imageUrl');
+     const scriptURL = 'https://script.google.com/macros/s/AKfycbzY7lRyJxEBWV3dGU9D6uOoW8e8d5gGYDoinvuOzeucIkIRLevj9jU7q72mla5iQPMffg/exec';
+const form = document.forms['datacard'];
+const submitButton = form.querySelector('input[type="submit"]');
+const imagePreview = document.getElementById('imagePreview');
+const imageUrlField = document.getElementById('imageUrl');
 
-    
-    
-        function handleCheckboxChange() {
-            const isNameDisplayChecked = document.getElementById('changeNameDisplay').checked;
-            const isRaceChecked = document.getElementById('changeRace').checked;
-            const isMainJobChecked = document.getElementById('changeMainJob').checked;
-            const isSubJobChecked = document.getElementById('changeSubJob').checked;
-            const isImageChecked = document.getElementById('changeImage').checked;
-    
-            document.getElementById('nameDisplay').classList.toggle('hidden', !isNameDisplayChecked);
-            document.getElementById('race').classList.toggle('hidden', !isRaceChecked);
-            document.getElementById('mainJob').classList.toggle('hidden', !isMainJobChecked);
-            document.getElementById('subJob').classList.toggle('hidden', !isSubJobChecked);
-            document.getElementById('imageUrl').classList.toggle('hidden', !isImageChecked);
-            imagePreviewContainer.classList.toggle('hidden', !isImageChecked);
-        }
-    
-        function updatePreview() {
-            const url = imageUrlField.value;
-            imagePreview.src = url || 'https://xionero.github.io/melblack/preview.jpg';
-        }
-    
-        function submitForm() {
+function handleCheckboxChange() {
+    const isNameDisplayChecked = document.getElementById('changeNameDisplay').checked;
+    const isRaceChecked = document.getElementById('changeRace').checked;
+    const isMainJobChecked = document.getElementById('changeMainJob').checked;
+    const isSubJobChecked = document.getElementById('changeSubJob').checked;
+    const isImageChecked = document.getElementById('changeImage').checked;
+
+    document.getElementById('nameDisplay').classList.toggle('hidden', !isNameDisplayChecked);
+    document.getElementById('race').classList.toggle('hidden', !isRaceChecked);
+    document.getElementById('mainJob').classList.toggle('hidden', !isMainJobChecked);
+    document.getElementById('subJob').classList.toggle('hidden', !isSubJobChecked);
+    document.getElementById('imageUrl').classList.toggle('hidden', !isImageChecked);
+    imagePreviewContainer.classList.toggle('hidden', !isImageChecked);
+}
+
+function updatePreview() {
+    const url = imageUrlField.value;
+    imagePreview.src = url || 'https://xionero.github.io/melblack/preview.jpg';
+}
+
+function checkImageUrl(url) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.src = url;
+        img.onload = () => resolve(true); // URL ใช้งานได้
+        img.onerror = () => resolve(false); // URL ใช้งานไม่ได้
+    });
+}
+
+async function submitForm() {
     const nameField = document.getElementById('youtubeName').value.trim();
     const isNameDisplayChecked = document.getElementById('changeNameDisplay').checked;
     const isImageChecked = document.getElementById('changeImage').checked;
 
     // ตรวจสอบว่ามีการกรอกชื่อหรือไม่
     if (!nameField) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'กรุณากรอกชื่อ',
+        });
         return;
     }
 
@@ -273,12 +284,33 @@
 
     // ตรวจสอบว่ามีการกรอกข้อมูลในช่องที่เกี่ยวข้องหรือไม่สำหรับการเปลี่ยนชื่อ
     if (isNameDisplayChecked && !document.getElementById('nameDisplay').value.trim()) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'กรุณากรอกชื่อที่จะเปลี่ยน',
+        });
         return;
     }
-    
+
     // ตรวจสอบว่ามีการกรอกข้อมูลในช่อง URL รูปภาพหรือไม่
-    if (isImageChecked && !document.getElementById('imageUrl').value.trim()) {
+    if (isImageChecked && !imageUrlField.value.trim()) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'กรุณากรอก URL รูปภาพ',
+        });
         return;
+    }
+
+    // ตรวจสอบ URL รูปภาพว่าถูกต้องหรือไม่
+    if (isImageChecked) {
+        const isImageValid = await checkImageUrl(imageUrlField.value);
+        if (!isImageValid) {
+            Swal.fire({
+                icon: 'error',
+                title: 'URL รูปภาพไม่ถูกต้อง!',
+                text: 'กรุณาตรวจสอบ URL ของรูปภาพอีกครั้ง',
+            });
+            return; // หยุดการดำเนินการถ้า URL ไม่ถูกต้อง
+        }
     }
 
     // หากผ่านการตรวจสอบทั้งหมด สามารถส่งฟอร์มได้
@@ -309,7 +341,7 @@
                         document.getElementById('race').value = "";
                         document.getElementById('mainJob').value = "";
                         document.getElementById('subJob').value = "";
-                        document.getElementById('imageUrl').value = "";
+                        imageUrlField.value = "";
 
                         form.name.value = youtubeName;
 
