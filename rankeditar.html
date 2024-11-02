@@ -229,25 +229,25 @@
             color = 'gold';
         } else if (rankexp >= 350) {
             rankLetter = 'A';
-            color = 'silver';
+            color = '#c0c0c0';
         } else if (rankexp >= 250) {
             rankLetter = 'B';
-            color = '#ff7043';
+            color = '#ff9a7c';
         } else if (rankexp >= 150) {
             rankLetter = 'C';
-            color = 'green';
+            color = '#a0e0a0';
         } else if (rankexp >= 100) {
             rankLetter = 'D';
-            color = 'blue';
+            color = '#add8e6';
         } else if (rankexp >= 50) {
             rankLetter = 'E';
-            color = 'purple';
+            color = '#d3a6e6';
         } else if (rankexp >= 25) {
             rankLetter = 'F';
-            color = 'brown';
+            color = '#d2b48c';
         } else {
             rankLetter = 'G';
-            color = 'gray';
+            color = '#d3d3d3';
         }
 
         return `<span style="color: ${color}; font-size: 20px; font-weight: bold; padding: 2px; border-radius: 5px;">${rankLetter}</span>`;
