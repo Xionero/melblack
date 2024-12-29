@@ -3,214 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leaderboard</title>
+  <title>OldRank</title>
   <style>
-    /* CSS for styling the table */
     body {
       font-family: Arial, sans-serif;
-      background-color: rgba(0, 0, 0, 0); /* Transparent */
-      color: #fff; /* White text */
-      margin: 0;
-      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      height: 100vh;
+      margin: 0;
+      background-color: transparent;
     }
-    h2 {
-      text-align: center;
-      color: #fff;
-      font-size: 24px;
-      font-weight: bold;
-      margin-top: 20px;
-    }
-    table {
-      border-collapse: collapse;
-      width: 400px;
-      height: auto;
-      border-radius: 8px;
+    .image-container {
+      border-radius: 15px;
       overflow: hidden;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-      background-color: #2e2e2e;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
-    th, td {
-      border: 1px solid #444;
-      padding: 10px;
-      text-align: center;
-      vertical-align: middle;
-    }
-    th {
-      background-color: #3e3e3e;
-      color: #ccc;
-      font-weight: normal;
-    }
-    tr:nth-child(even) {
-      background-color: #333;
-    }
-    tr:hover {
-      background-color: #444;
-    }
-    .race-icon {
-      max-width: 30px;
-      max-height: 30px;
-      border-radius: 50%;
-      width: auto;
+    img {
+      width: 100%;
       height: auto;
       display: block;
-      margin: 0 auto;
-    }
-    .name-cell {
-      text-align: left;
-      max-width: 180px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      padding-left: 10px;
-    }
-    .race-column, .rank-column, .score-column {
-      width: 30px;
-      text-align: center;
-    }
-    tr {
-      height: 50px;
     }
   </style>
 </head>
 <body>
-  <table id="leaderboard">
-    <thead>
-      <tr>
-        <th class="race-column">Guild</th>
-        <th class="rank-column">Rank</th>
-        <th class="name-cell">Name</th>
-        <th class="score-column">Score</th>
-      </tr>
-    </thead>
-    <tbody id="leaderboard-body">
-      <!-- Leaderboard data will be displayed here -->
-    </tbody>
-  </table>
 
-  <script>
-    // Function to fetch race data from DataCard
-    async function fetchRaceData() {
-      return fetch('https://script.google.com/macros/s/AKfycbzCdxblONQQRfAvwaBV8i9RNfKuBnNnqp7YQobNOhUIgIleIA087yco5an0e0ycCN6K6g/exec')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-          }
-          return response.json();
-        })
-        .then(data => {
-          const raceMap = new Map();
-          const nameMap = new Map();
-          data.forEach(row => {
-            const handlename = row.handlename;
-            const race = row.race;
-            if (handlename) {
-              nameMap.set(row.name, handlename);
-            }
-            raceMap.set(handlename, race);
-          });
-          return { raceMap, nameMap, data };
-        })
-        .catch(error => console.error('Error fetching race data:', error));
-    }
+  <div class="image-container">
+    <img src="https://xionero.github.io/melblack/oldrank.png" alt="Image">
+  </div>
 
-    // Function to get race icon based on score
-    function getRaceIcon(race, score) {
-      let raceName = race;
-      let raceFileName;
-
-      if (score >= 135) {
-        switch (raceName) {
-          case 'Human': raceName = 'Hero'; break;
-          case 'Elf': raceName = 'High Elf'; break;
-          case 'Dwarf': raceName = 'Dwarf King'; break;
-          case 'Angel': raceName = 'Arc Angel'; break;
-          case 'Goblin': raceName = 'Hobgoblin'; break;
-          case 'Fairy': raceName = 'Fairy Queen'; break;
-          case 'Dryad': raceName = 'Elder Dryad'; break;
-          case 'Dragon': raceName = 'Elder Dragon'; break;
-          case 'Vampire': raceName = 'Vampire Lord'; break;
-          case 'Werebeast': raceName = 'Warlord Beast'; break;
-          case 'Mermaid': raceName = 'Mermaid Queen'; break;
-          case 'Demon': raceName = 'Demon Lord'; break;
-          case 'Slime': raceName = 'Demon Slime'; break;
-          case 'Undead': raceName = 'Lich'; break;
-          default: raceName = race; break;
-        }
-      }
-
-      raceFileName = raceName.toLowerCase().replace(/ /g, '_');
-      return `<img src="https://meltopiaadventure.web.app/race/${raceFileName}.png" alt="${raceName} icon" class="race-icon">`;
-    }
-
-    // Display leaderboard with handlename, score, rankexp, and race
-    function displayLeaderboard() {
-      fetchRaceData().then(({ raceMap, nameMap, data }) => {
-        const leaderboardBody = document.getElementById('leaderboard-body');
-        leaderboardBody.innerHTML = ""; // Clear old data
-
-        // Loop through the fetched data and display it
-        data.forEach((row) => {
-          const handlename = row.handlename;
-          const score = row.exp;
-          const rankExp = row.rankexp;
-          const race = raceMap.get(handlename) || '';
-          const raceIcon = race ? getRaceIcon(race, score) : '';
-
-          const newRow = document.createElement('tr');
-          newRow.innerHTML = `
-            <td class="race-column">${raceIcon}</td>
-            <td class="rank-column">${calculateRank(rankExp + score)}</td>
-            <td class="name-cell">${handlename}</td>
-            <td class="score-column">${score}</td>
-          `;
-          leaderboardBody.appendChild(newRow);
-        });
-      }).catch(error => console.error('Error displaying leaderboard:', error));
-    }
-
-    // Function to calculate rank based on rankexp
-    function calculateRank(rankexp) {
-      let rankLetter = '';
-      let color = '';
-      
-      if (rankexp >= 500) {
-        rankLetter = 'S';
-        color = 'gold';
-      } else if (rankexp >= 350) {
-        rankLetter = 'A';
-        color = '#c0c0c0';
-      } else if (rankexp >= 250) {
-        rankLetter = 'B';
-        color = '#ff9a7c';
-      } else if (rankexp >= 150) {
-        rankLetter = 'C';
-        color = '#a0e0a0';
-      } else if (rankexp >= 100) {
-        rankLetter = 'D';
-        color = '#add8e6';
-      } else if (rankexp >= 50) {
-        rankLetter = 'E';
-        color = '#d3a6e6';
-      } else if (rankexp >= 25) {
-        rankLetter = 'F';
-        color = '#d2b48c';
-      } else {
-        rankLetter = 'G';
-        color = '#d3d3d3';
-      }
-
-      return `<span style="color: ${color}; font-size: 20px; font-weight: bold; padding: 2px; border-radius: 5px;">${rankLetter}</span>`;
-    }
-
-    // Initial call to display leaderboard
-    displayLeaderboard();
-    
-    // Polling for real-time updates
-    setInterval(displayLeaderboard, 10000); // Update every 10 seconds
-  </script>
 </body>
 </html>
