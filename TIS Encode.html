@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>TIS-620 to Unicode Converter</title>
+  <script type="text/javascript">
+    var unencrypt = {};
+    var encrypt = {};
+
+    function map(code, unicode) {
+      unencrypt[code] = unicode;
+      encrypt[unicode] = code;
+    }
+
+    function strict_tis_620() {
+      var thai_unicode_offset = 0xd60;
+      for (var x = 0xe01; x <= 0xe3a; x++) {
+        map(String.fromCharCode(x - thai_unicode_offset), String.fromCharCode(x));
+      }
+      for (var x = 0xe3f; x <= 0xe5b; x++) {
+        map(String.fromCharCode(x - thai_unicode_offset), String.fromCharCode(x));
+      }
+    }
+
+    function convert() {
+      var pi, onch, newch;
+      pi = 0;
+      document.myform.scratch.value = "";
+      while (pi < document.myform.wordsin.value.length) {
+        onch = document.myform.wordsin.value.charAt(pi++);
+        newch = unencrypt[onch];
+        document.myform.scratch.value += newch ? newch : onch;
+      }
+    }
+
+    function convert_back() {
+      var pi, onch, newch;
+      pi = 0;
+      document.myform.wordsin.value = "";
+      while (pi < document.myform.scratch.value.length) {
+        onch = document.myform.scratch.value.charAt(pi++);
+        newch = encrypt[onch];
+        document.myform.wordsin.value += newch ? newch : onch;
+      }
+    }
+
+    strict_tis_620();
+  </script>
+</head>
+<body>
+  <h1>TIS-620 to Unicode Converter</h1>
+  <form name="myform">
+    <h2>TIS-620 Text</h2>
+    <textarea name="wordsin" rows="10" cols="80"></textarea><br>
+    <input type="button" value="Convert TIS-620 to Unicode" onclick="convert()">
+    <h2>Unicode Text</h2>
+    <textarea name="scratch" rows="10" cols="80"></textarea><br>
+    <input type="button" value="Convert Unicode to TIS-620" onclick="convert_back()">
+  </form>
+</body>
+</html>
