@@ -312,16 +312,6 @@ async function submitForm() {
             return; // หยุดการดำเนินการถ้า URL ไม่ถูกต้อง
         }
     }
- function disableCheckboxes() {
-        // Disable รายการที่ต้องการ
-        document.getElementById("changeRace").disabled = true;  // ปิด Profile
-	document.getElementById("changeMainJob").disabled = true;  // ปิด Profile
-        document.getElementById("changeSubJob").disabled = true; // ปิด Career
-    }
-
-    // เรียกใช้ตอนโหลดหน้า
-    window.onload = disableCheckboxes;
-
 	
     // หากผ่านการตรวจสอบทั้งหมด สามารถส่งฟอร์มได้
     Swal.fire({
