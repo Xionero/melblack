@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Meltopia Guild Cards</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+
+    <style>
+        @font-face {
+            font-family: 'PlayingGames';
+            src: url('assets/css/PlayingGames.ttf') format('truetype');
+            /* Update with the correct path to the font */
+        }
+
+        @font-face {
+            font-family: 'TheX-Files';
+            src: url('assets/css/TheX-Files.ttf') format('truetype');
+            /* Update with the correct path to the font */
+        }
+
+        @font-face {
+            font-family: 'RankedSports';
+            src: url('assets/css/RankedSports-Regular.ttf') format('truetype');
+            /* Update with the correct path to the font */
+        }
+
+        @font-face {
+            font-family: 'apluemz';
+            src: url('assets/css/f0ntuni-apluemz.otf') format('truetype');
+            /* Update with the correct path to the font */
+        }
+
+        #leaderboard {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .card {
+            background: none;
+            background-size: contain;
+            /* ทำให้ภาพแสดงเต็มโดยรักษาสัดส่วน */
+            border-radius: 10px;
+            width: 280px;
+            height: 164px;
+            /* กำหนดความสูงของการ์ดเพื่อให้แน่ใจว่าภาพไม่หาย */
+            padding: 0px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #2b2b2b;
+            box-sizing: border-box;
+            position: relative;
+            cursor: pointer;
+            /* เพิ่ม cursor pointer เพื่อให้รู้ว่าการ์ดสามารถคลิกได้ */
+        }
+
+        .card p {
+            margin: 0;
+            padding: 0;
+            font-size: 12px;
+            text-overflow: ellipsis;
+            text-align: left;
+            /* Align text to the left */
+        }
+
+        .card p span {
+            font-weight: bold;
+            text-align: left;
+            /* Align text to the left */
+            margin-right: 10px;
+        }
+
+        .card p .value {
+            text-align: left;
+            /* Align text to the left */
+            display: flex;
+            /* Ensure it behaves as a flex container */
+            align-items: flex-start;
+            /* Align items to the left */
+        }
+
+        .card:hover {
+            transform: scale(1.03);
+            /* เพิ่มเอฟเฟ็กต์ขยายเมื่อวางเมาส์ */
+        }
+
+        .profile-pic {
+            width: 55px;
+            height: 66px;
+            margin-right: 0px;
+            border-radius: 1%;
+            border: 1px solid #000;
+            object-fit: cover;
+            margin-left: 208px;
+            /* Move details up closer to the header */
+            margin-top: 88px
+        }
+
+        .race-icon {
+            width: 18px;
+            height: 18px;
+            object-fit: cover;
+            position: absolute;
+            top: 18px;
+            left: 18px;
+        }
+
+        .card-details {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 5px;
+            box-sizing: border-box;
+            margin-top: -117px;
+            /* Move details up closer to the header */
+            margin-left: 70px;
+            align-items: flex-start;
+            /* Align items to the left */
+            width: 200px;
+            /* กำหนดความกว้างให้กับ card-details */
+        }
+
+        .card-details p,
+        .card-details div {
+            line-height: 1.50;
+            /* ปรับความสูงของบรรทัด */
+            font-family: 'apluemz', sans-serif;
+            /* ใช้ฟอนต์ CROWNT */
+        }
+
+        .rank-details {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 3px;
+            box-sizing: border-box;
+            position: absolute;
+            /* ใช้ position absolute */
+            margin-left: -206px;
+            /* หรือค่าที่คุณต้องการ */
+            margin-top: 46px;
+            /* ปรับขึ้นตามต้องการ */
+            font-family: 'RankedSports', sans-serif;
+            /* ใช้ฟอนต์ Babelgam */
+        }
+
+        .lv-details {
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            /* จัดให้อยู่ตรงกลางแนวตั้ง */
+            justify-content: center;
+            /* จัดให้อยู่ตรงกลางแนวนอน */
+            flex-direction: column;
+            flex: 1;
+            padding: 3.5px;
+            margin-top: -134px;
+            margin-left: -217px;
+            font-family: 'PlayingGames', sans-serif;
+            /* ใช้ฟอนต์ Babelgam */
+        }
+
+        .progress-bar-container {
+            width: 200px;
+            height: 8px;
+            background-color: #5a5a5a;
+            border-radius: 5px;
+            position: absolute;
+            /* ใช้ position absolute */
+            top: -10px;
+            left: -33px;
+            position: relative;
+        }
+
+        .progress-barx {
+            height: 100%;
+            border-radius: 5px;
+            width: 0;
+            transition: width 0.3s;
+            background: linear-gradient(to right, #ffd06a, #ff6a6a);
+        }
+
+        .progress-bar-textx {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        #fullSizeImageContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #fullSizeImage {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        button {
+            position: fixed;
+            /* Changed to fixed for better centering */
+            right: 20px;
+            top: 11%;
+            /* Center vertically */
+            transform: translateY(-50%);
+            /* Adjust for exact vertical centering */
+            background-color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .name {
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+            color: #666666;
+            letter-spacing: 0.8px;
+            /* เพิ่มระยะห่าง */
+            -webkit-text-stroke: 0.1px rgb(0, 0, 0);
+            /* Add white outline */
+        }
+
+        .name-long {
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+            top: 1.5px;
+            color: #666666;
+            letter-spacing: 0.8px;
+            /* เพิ่มระยะห่าง */
+            -webkit-text-stroke: 0.2px rgb(0, 0, 0);
+            /* Add white outline */
+        }
+
+        .name-longest {
+            font-size: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+            top: 1.5px;
+            color: #666666;
+            letter-spacing: 0.8px;
+            /* เพิ่มระยะห่าง */
+            -webkit-text-stroke: 0.2px rgb(0, 0, 0);
+            /* Add white outline */
+        }
+
+        .name-longestfar {
+            font-size: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+            top: 1.5px;
+            color: #666666;
+            letter-spacing: 0.8px;
+            /* เพิ่มระยะห่าง */
+            -webkit-text-stroke: 0.2px rgb(0, 0, 0);
+            /* Add white outline */
+        }
+
+        .row-mod {
+            color: #3094f1;
+            position: absolute;
+            top: 0;
+            margin-left: -226px;
+            margin-top: 117px;
+            -webkit-text-stroke: 0.7px rgb(0, 0, 0);
+            /* Add white outline */
+        }
+
+        .row-head {
+            color: #1b0f09;
+            position: absolute;
+            top: 0;
+            margin-top: 4px;
+            font-size: 11px;
+            /* ปรับขนาดอักษรตามต้องการ */
+            font-weight: bold;
+            /* ทำให้ข้อความตัวหนา */
+            text-shadow: 1px 1px 3px #000000;
+            /* เพิ่มเงาสีขาว */
+            font-family: 'TheX-Files', sans-serif;
+            /* ใช้ฟอนต์ CROWNT */
+        }
+
+        .row-tag {
+            color: #000000;
+            position: absolute;
+            top: 0;
+            margin-left: -100px;
+            margin-top: 40px;
+            font-size: 0.1px;
+            opacity: 0.5;
+            /* ปรับให้จางลง */
+        }
+
+        .row-tag p {
+            margin-bottom: 5px;
+            /* ปรับระยะห่างตามต้องการ */
+        }
+
+        .job-value {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="leaderboard">
+        <!-- ข้อมูลนักผจญภัยจะถูกแสดงที่นี่ -->
+    </div>
+
+    <div id="fullSizeImageContainer" style="display: none;">
+        <img id="fullSizeImage" src="" alt="Full Size Image">
+        <button onclick="closeImage()">Close</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', fetchLeaderboard);
+        setInterval(fetchLeaderboard, 3000);
+
+        function fetchLeaderboard() {
+            fetch('https://script.google.com/macros/s/AKfycbx67k-Ev63AZys0sKJgiqWVacanih7jSod_BVfVAQ4OcWZNHnB_DslQBLepEF8rbrbulw/exec')
+                .then(response => response.json())
+                .then(data => {
+                    const leaderboard = document.getElementById('leaderboard');
+                    leaderboard.innerHTML = "";
+                    data.slice(0, 100).forEach((row) => {
+                        const card = document.createElement('div');
+                        card.className = 'card';
+
+                        let nameClass = 'name';
+                        if (row.name.length > 40) {
+                            nameClass = 'name-longestfar';
+                        } else if (row.name.length > 30) {
+                            nameClass = 'name-longest';
+                        } else if (row.name.length > 20) {
+                            nameClass = 'name-long';
+                        }
+
+                        const {
+                            level,
+                            remainingEXP
+                        } = calculateLevel(row.exp);
+                        const expTable = [0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60];
+                        const nextLevelExp = level < 20 ? expTable[level] : expTable.slice(1, 21).reduce((acc, val) => acc + val, 0);
+                        const progressPercentage = level < 20 ? (remainingEXP / nextLevelExp) * 100 : 100;
+
+                        const levelText = level < 20 ? `${level}` : '20 Max';
+                        const rank = calculateRank(row.rankexp); // Determine rank
+
+                        const raceStyle = level >= 10 ? 'color: rgb(255, 13, 13);' : '';
+                        const lvStyle = level >= 10 ? 'color: rgb(255, 13, 13);' : '';
+
+                        let raceIcon = '';
+                        const validRaces = ['Blue Pegasus', 'Cait Shelter', 'Crime Sorcière', 'Diabolos', 'Dullahan Head', 'Fairy Nail', 'Fairy Tail', 'Lamia Scale', 'Mermaid Heels', 'Orochi Fin', 'Phantom Lord', 'Quatro Cerberus', 'Raven Tail', 'Sabertooth', 'Southern Wolves', 'Sylph Labyrinth', 'Tartaros', 'The Grimoire Heart', 'The Oracion Seis', 'Twilight Ogre', 'Planeptune', 'Lastation', 'Leanbox', 'Lowee'];
+
+                        let raceName = row.race;
+
+                        if (validRaces.includes(row.race)) {
+                            let raceFileName = raceName.toLowerCase().replace(/ /g, '_');
+                            raceIcon = `<img src="race/${raceFileName}.png" alt="${raceName} icon" class="race-icon">`;
+                        } else {
+                            console.error(`Race ${row.race} is not valid.`);
+                        }
+
+                        const raceBackgrounds = {
+                            'Blue Pegasus': 'card/Blue_pegasus.jpg',
+                            'Cait Shelter': 'card/Cait_shelter.jpg',
+                            'Crime Sorcière': 'card/Crime_Sorcière.jpg',
+                            'Diabolos': 'card/Diabolos.jpg',
+                            'Dullahan Head': 'card/Dullahan_Head.jpg',
+                            'Fairy Nail': 'card/Fairy_Nail.jpg',
+                            'Fairy Tail': 'card/Fairy_Tail.jpg',
+                            'Lamia Scale': 'card/Lamia_scale.jpg',
+                            'Mermaid Heels': 'card/Mermaid_Heels.jpg',
+                            'Orochi Fin': 'card/Orochi_Fin.jpg',
+                            'Phantom Lord': 'card/Phantom_Lord.jpg',
+                            'Quatro Cerberus': 'card/Quatro_Cerberus.jpg',
+                            'Raven Tail': 'card/Raven_Tail.jpg',
+                            'Sabertooth': 'card/Sabertooth.jpg',
+                            'Southern Wolves': 'card/Southern_Wolves.jpg',
+                            'Sylph Labyrinth': 'card/Sylph_Labyrinth.jpg',
+                            'Tartaros': 'card/Tartaros.jpg',
+                            'The Grimoire Heart': 'card/The_Grimoire_Heart.jpg',
+                            'The Oracion Seis': 'card/The_Oracion_Seis.jpg',
+                            'Twilight Ogre': 'card/Twilight_Ogre.jpg',
+                            'Planeptune': 'card/Planeptune.jpg',
+                            'Lastation': 'card/Lastation.jpg',
+                            'Leanbox': 'card/Leanbox.jpg',
+                            'Lowee': 'card/Lowee.jpg'
+                        };
+
+                        const race = row.race;
+                        const bgImage = raceBackgrounds[race] || raceBackgrounds.default; // ใช้พื้นหลังตาม race หรือค่าปกติถ้าไม่พบ
+                        card.style.backgroundImage = `url('${bgImage}')`;
+
+                        card.innerHTML = `
+                            <div id="tegContainer" class="row-tag">
+                                <p>Name</p>
+                                <p>Magic Type</p>
+                                <p>Career</p>
+                                <p>Jewels</p>
+                            </div>
+
+                            <div class="card-content">
+                                <img src="${row.image}" alt="Profile Picture" class="profile-pic">
+                            </div>
+                            <div class="card-details">
+                                <p><span class="${nameClass}">${row.name}</span></p>
+                                <p><span class="${nameClass}">${row.class}</span></p>
+                                <p><span class="${nameClass}">${row.job}</span></p>
+                                <p><span class="${nameClass}">${row.zeny}</span></p>
+                            </div>
+
+                            <div class="lv-details">
+                                <p> </span> <span class="value" style="${lvStyle}"> ${levelText}</span></p>
+                            </div>
+                            <div class="rank-details">
+                                <p> </span> <span class="value" style="font-size: 17px;">${rank}</span></p>
+                            </div>
+
+                            <div class="progress-bar-container">
+                                <div class="progress-barx" style="width: ${progressPercentage}%"></div>
+                                <div class="progress-bar-textx">${Math.round(progressPercentage)}%</div>
+                            </div>
+                            ${raceIcon}
+                            <div id="modContainer" class="row-mod">${row.mod}</div>
+                            <div id="nameContainer" class="row-head">${row.race} Guild Card</div>
+                        `;
+
+                        card.addEventListener('click', () => {
+                            const imageSrc = `${row.image}`;
+
+                            // Create a new image element
+                            const img = document.createElement('img');
+                            img.src = imageSrc;
+                            img.style.width = '525px'; // 750px * 0.7 = 525px
+                            img.style.height = '700px'; // 1000px * 0.7 = 700px
+                            img.style.border = '8px solid #888'; // Gray border
+                            img.style.borderRadius = '10px'; // Rounded corners
+                            img.style.objectFit = 'cover'; // Maintain aspect ratio and cover dimensions
+
+                            // Create a container for the image
+                            const container = document.createElement('div');
+                            container.style.position = 'fixed';
+                            container.style.top = '0';
+                            container.style.left = '0';
+                            container.style.width = '100%';
+                            container.style.height = '100%';
+                            container.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                            container.style.display = 'flex';
+                            container.style.justifyContent = 'center';
+                            container.style.alignItems = 'center';
+                            container.style.zIndex = '1000';
+                            container.style.overflow = 'hidden'; // Hide overflow to ensure no scrollbars
+
+                            // Append the image to the container
+                            container.appendChild(img);
+
+                            // Append the container to the body
+                            document.body.appendChild(container);
+
+                            // Add an event listener to close the image when clicking outside of it
+                            container.addEventListener('click', () => {
+                                document.body.removeChild(container);
+                            });
+                        });
+
+                        leaderboard.appendChild(card);
+                    });
+                })
+                .catch(error => console.error('เกิดข้อผิดพลาดในการดึงข้อมูล:', error));
+        }
+
+        function showImage(imageSrc) {
+            const fullSizeImage = document.getElementById('fullSizeImage');
+            const fullSizeImageContainer = document.getElementById('fullSizeImageContainer');
+            fullSizeImage.src = imageSrc;
+            fullSizeImageContainer.style.display = 'flex'; // แสดงภาพเต็มขนาด
+        }
+
+        function closeImage() {
+            document.getElementById('fullSizeImageContainer').style.display = 'none';
+        }
+
+        function calculateLevel(exp) {
+            const expTable = [0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60];
+            let level = 1;
+            let accumulatedEXP = 0;
+
+            while (level < expTable.length && exp >= accumulatedEXP + expTable[level]) {
+                accumulatedEXP += expTable[level];
+                level++;
+            }
+
+            // Cap the level at 20
+            if (level > 20) {
+                level = 20;
+                accumulatedEXP = expTable.slice(1, 21).reduce((acc, val) => acc + val, 0);
+            }
+
+            const remainingEXP = exp - accumulatedEXP;
+
+            return {
+                level,
+                remainingEXP
+            };
+        }
+
+        function calculateRank(rankexp) {
+            if (rankexp >= 2000) return '<span style="color: gold; -webkit-text-stroke: 0.3px rgb(0, 0, 0); position: relative; top: 3px; font-size: 12px;">SSS</span>'; // Lighter gold for S rank
+            if (rankexp >= 1000) return '<span style="color: gold; -webkit-text-stroke: 0.3px rgb(0, 0, 0); position: relative; top: 1px; font-size: 15px;">SS</span>'; // Lighter gold for S rank
+            if (rankexp >= 500) return '<span style="color: gold; -webkit-text-stroke: 0.3px rgb(0, 0, 0);">S</span>'; // Lighter gold for S rank
+            if (rankexp >= 350) return '<span style="color: #c0c0c0; -webkit-text-stroke: 0.3px rgb(0, 0, 0);">A</span>'; // Lighter silver for A rank
+            if (rankexp >= 250) return '<span style="color: #ff9a7c; -webkit-text-stroke: 0.3px rgb(0, 0, 0);">B</span>'; // Lighter red for B rank
+            if (rankexp >= 150) return '<span style="color: #a0e0a0; -webkit-text-stroke: 0.3px rgb(0, 0, 0);">C</span>'; // Lighter green for C rank
+            if (rankexp >= 100) return '<span style="color: #add8e6; -webkit-text-stroke: 0.3px rgb(0, 0, 0);">D</span>'; // Lighter blue for D rank
+            if (rankexp >= 50) return '<span style="color: #d3a6e6; -webkit-text-stroke: 0.3px rgb(0, 0, 0);">E</span>'; // Lighter purple for E rank
+            if (rankexp >= 25) return '<span style="color: #d2b48c; -webkit-text-stroke: 0.3px rgb(0, 0, 0);">F</span>'; // Lighter brown for F rank
+            if (rankexp >= 0) return '<span style="color: #d3d3d3; -webkit-text-stroke: 0.3px rgb(0, 0, 0);">G</span>'; // Lighter gray for G rank
+            if (rankexp >= -1) return '<span style="color: #f5f5f5; -webkit-text-stroke: 0.3px rgb(0, 0, 0);">X</span>'; // Very light gray for X rank
+        }
+    </script>
+
+</body>
+
+</html>
