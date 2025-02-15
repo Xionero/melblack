@@ -9,21 +9,22 @@
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@400;500&display=swap');
         
         body {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* จัดเนื้อหาให้อยู่บนสุด */
-    height: 100vh;
-    margin: 0;
-    font-family: 'Prompt', sans-serif; /* ใช้ฟอนต์ Prompt */
-    padding-top: 20px; /* เพิ่มระยะห่างจากด้านบน */
-    overflow: hidden; /* เอาการเลื่อนออก */
-}
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* จัดเนื้อหาให้อยู่บนสุด */
+            height: 100vh;
+            margin: 0;
+            font-family: 'Prompt', sans-serif; /* ใช้ฟอนต์ Prompt */
+            padding-top: 20px; /* เพิ่มระยะห่างจากด้านบน */
+            overflow-x: hidden; /* ป้องกันการเลื่อนแนวนอน */
+        }
 
 
         .container {
             display: flex;
-            flex-direction: column;
-            gap: 30px;
+            flex-direction: row; /* เปลี่ยนเป็น row เพื่อให้รูปภาพอยู่ข้างกัน */
+            justify-content: center; /* จัดให้อยู่ตรงกลาง */
+            gap: 30px; /* ระยะห่างระหว่างรูปภาพ */
             text-align: center;
             width: 80%;
             max-width: 800px;
@@ -31,7 +32,7 @@
 
         .image-row {
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* จัดให้รูปภาพและข้อความอยู่เป็นแนวตั้ง */
             align-items: center;
             transition: transform 0.3s ease;
         }
@@ -39,6 +40,7 @@
         .image-row img {
             width: 300px;
             height: auto;
+            display: block; /* ทำให้ img เป็น block element */
         }
 
         .image-row p {
@@ -60,9 +62,9 @@
             color: blue;
         }
         .highlight-text {
-  color: rgb(255, 255, 255); /* เปลี่ยนเป็นสีที่ต้องการ */
-  font-weight: bold; /* ทำตัวหนา */
-}
+          color: rgb(255, 255, 255); /* เปลี่ยนเป็นสีที่ต้องการ */
+          font-weight: bold; /* ทำตัวหนา */
+        }
     </style>
 </head>
 <body>
@@ -70,9 +72,13 @@
         <div class="image-row">
             <a href="https://e.tip.in.th/site/index/1349" target="_blank">
                 <img src="assets/img/donate.png" alt="รูปที่ 1">
-            <a href="https://tipme.in.th/adba897fb2a0a8e415402f54" target="_blank">
-                <img src="assets/img/donate.png" alt="รูปที่ 2">
-            </div>
+            </a>
         </div>
+        <div class="image-row">
+             <a href="https://tipme.in.th/adba897fb2a0a8e415402f54" target="_blank">
+                <img src="assets/img/donate.png" alt="รูปที่ 2">
+            </a>
+        </div>
+    </div>
 </body>
 </html>
