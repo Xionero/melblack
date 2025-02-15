@@ -1,30 +1,26 @@
 <!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
+<html lang="th"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>รูปภาพพร้อมคำอธิบาย</title>
     <style>
-        /* นำเข้าฟอนต์จาก Google Fonts */
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@400;500&display=swap');
         
         body {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* จัดเนื้อหาให้อยู่บนสุด */
-            height: 100vh;
-            margin: 0;
-            font-family: 'Prompt', sans-serif; /* ใช้ฟอนต์ Prompt */
-            padding-top: 20px; /* เพิ่มระยะห่างจากด้านบน */
-            overflow-x: hidden; /* ป้องกันการเลื่อนแนวนอน */
-        }
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* จัดเนื้อหาให้อยู่บนสุด */
+    height: 100vh;
+    margin: 0;
+    font-family: 'Prompt', sans-serif; /* ใช้ฟอนต์ Prompt */
+    padding-top: 20px; /* เพิ่มระยะห่างจากด้านบน */
+    overflow: hidden; /* เอาการเลื่อนออก */
+}
 
 
         .container {
             display: flex;
-            flex-direction: row; /* เปลี่ยนเป็น row เพื่อให้รูปภาพอยู่ข้างกัน */
-            justify-content: center; /* จัดให้อยู่ตรงกลาง */
-            gap: 30px; /* ระยะห่างระหว่างรูปภาพ */
+            flex-direction: column;
+            gap: 30px;
             text-align: center;
             width: 80%;
             max-width: 800px;
@@ -32,7 +28,7 @@
 
         .image-row {
             display: flex;
-            flex-direction: column; /* จัดให้รูปภาพและข้อความอยู่เป็นแนวตั้ง */
+            flex-direction: column;
             align-items: center;
             transition: transform 0.3s ease;
         }
@@ -40,7 +36,6 @@
         .image-row img {
             width: 300px;
             height: auto;
-            display: block; /* ทำให้ img เป็น block element */
         }
 
         .image-row p {
@@ -62,9 +57,9 @@
             color: blue;
         }
         .highlight-text {
-          color: rgb(255, 255, 255); /* เปลี่ยนเป็นสีที่ต้องการ */
-          font-weight: bold; /* ทำตัวหนา */
-        }
+  color: rgb(255, 255, 255); /* เปลี่ยนเป็นสีที่ต้องการ */
+  font-weight: bold; /* ทำตัวหนา */
+}
     </style>
 </head>
 <body>
