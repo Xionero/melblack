@@ -1,22 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>แสดงข้อมูล Rank จาก Google Sheet</title>
+  <title>Rank Data from Google Sheet</title>
   <style>
+    body {
+      font-family: sans-serif;
+      background-color: #121212; /* Dark background */
+      color: #eee; /* Light text */
+      margin: 0; /* Remove default margin */
+      padding: 0;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: #ddd; /* Slightly darker text for heading */
+    }
+
     table {
       border-collapse: collapse;
-      width: 50%;
+      width: 80%; /* Wider table */
+      max-width: 800px; /* Limit maximum width */
+      margin: 0 auto; /* Center the table */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Add a subtle shadow */
+      overflow: hidden; /* Hide any overflowing content (for rounded corners) */
+      border-radius: 10px; /* Rounded corners */
     }
+
     th, td {
-      border: 1px solid black;
-      padding: 8px;
+      padding: 12px 15px; /* More padding */
       text-align: left;
+      border-bottom: 1px solid #333; /* Darker border */
     }
+
+    th {
+      background-color: #252525; /* Darker header background */
+      color: #fff; /* White text for header */
+      font-weight: bold;
+      text-transform: uppercase; /* Uppercase header text */
+    }
+
+    /* Gradient background for table rows */
+    tbody tr {
+      background: linear-gradient(to bottom, #2c2c2c 0%, #1e1e1e 100%); /* Subtle gradient */
+    }
+
+    tbody tr:nth-child(odd) {
+      background: linear-gradient(to bottom, #303030 0%, #222222 100%);  /*slightly different odd row*/
+    }
+    tbody tr:hover{
+        background: linear-gradient(to bottom, #444444 0%, #303030 100%);
+        /* Brighter on hover */
+        cursor: pointer; /* Change cursor on hover */
+    }
+
+
+    /* Styling for error messages */
+    .error-message {
+      color: #ff6347; /* Tomato color for errors */
+      text-align: center;
+      margin-top: 1rem;
+    }
+
   </style>
   <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
-  <h1>ข้อมูล Rank</h1>
+  <h1>Rank Data</h1>
   <table id="data-table">
     <thead>
       <tr>
@@ -25,85 +76,74 @@
       </tr>
     </thead>
     <tbody>
-      <!-- ข้อมูลจะถูกใส่ที่นี่ -->
+      <!-- Data will be inserted here -->
     </tbody>
   </table>
 
   <script>
-    // 1. ค่าที่ต้องแก้ไข:
-    const apiKey = 'AIzaSyBeRiZ-yYa2S-FKzJJ_dNmtbYBtQwYpyGQ'; // API Key ของคุณ
+    // Replace with your API key and Spreadsheet ID
+    const apiKey = 'AIzaSyBeRiZ-yYa2S-FKzJJ_dNmtbYBtQwYpyGQ'; // Put your API Key here
     const spreadsheetId = '1QEnV5yZF_Suln7jJUNQSk2dJPloOX-GucxdKXaXCidw'; // Spreadsheet ID
 
-    // 2. ฟังก์ชันโหลด gapi และเริ่มต้น
     function loadGapiAndInit() {
       gapi.load('client', initClient);
     }
 
-    // 3. ฟังก์ชันเริ่มต้น (หลังจาก gapi โหลดแล้ว)
     function initClient() {
       gapi.client.init({
         apiKey: apiKey,
         discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
       }).then(function () {
-        // API พร้อมใช้งาน
         console.log("Google Sheets API is ready!");
         fetchSheetData();
       }, function(error) {
         console.error("Error initializing API:", error);
-        displayError("เกิดข้อผิดพลาดในการโหลด API: " + error.message);
+        displayError("Failed to load API: " + error.message);
       });
     }
 
-    // 4. ฟังก์ชันดึงข้อมูล
     function fetchSheetData() {
       gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: spreadsheetId,
-        range: 'rank!A:B', //  <--- เปลี่ยนตรงนี้:  ใช้ 'rank!A:B'
+        range: 'rank!A:B', // Assuming your sheet is named 'rank'
       }).then(function(response) {
         const values = response.result.values;
         if (values && values.length > 0) {
           displayData(values);
         } else {
-          displayError("ไม่พบข้อมูลในชีต rank"); // ข้อความ error ที่เฉพาะเจาะจงขึ้น
+          displayError("No data found in the 'rank' sheet.");
         }
       }, function(error) {
-        displayError("เกิดข้อผิดพลาดในการดึงข้อมูล: " + error.result.error.message);
+        displayError("Error fetching data: " + error.result.error.message);
       });
     }
 
-
-    // 5. ฟังก์ชันแสดงผลข้อมูล
     function displayData(values) {
-       const tableBody = document.querySelector('#data-table tbody');
-       tableBody.innerHTML = '';  // ล้างข้อมูลเก่า
+      const tableBody = document.querySelector('#data-table tbody');
+      tableBody.innerHTML = ''; // Clear previous data
 
-      values.forEach(row => { //วน loop แต่ละ row
-          const rank = row[0];
-          const name = row[1];
+      values.forEach(row => {
+        const rank = row[0];
+        const name = row[1];
 
-           // สร้าง table row
-          const newRow = document.createElement('tr');
+        const newRow = document.createElement('tr');
+        const rankCell = document.createElement('td');
+        rankCell.textContent = rank;
+        newRow.appendChild(rankCell);
+        const nameCell = document.createElement('td');
+        nameCell.textContent = name;
+        newRow.appendChild(nameCell);
 
-           // สร้าง table data cell สำหรับ rank
-          const rankCell = document.createElement('td');
-          rankCell.textContent = rank;
-          newRow.appendChild(rankCell);
-
-              // สร้าง table data cell สำหรับ name
-          const nameCell = document.createElement('td');
-          nameCell.textContent = name;
-          newRow.appendChild(nameCell);
-
-          tableBody.appendChild(newRow); // เพิ่ม row เข้าไปใน tbody
+        tableBody.appendChild(newRow);
       });
     }
-    // 6. ฟังก์ชันแสดง error (ปรับปรุง)
+
+
     function displayError(message) {
-      const tableBody = document.querySelector('#data-table tbody');
-      tableBody.innerHTML = `<tr><td colspan="2">${message}</td></tr>`;
+        const tableBody = document.querySelector('#data-table tbody');
+        tableBody.innerHTML = `<tr><td colspan="2" class="error-message">${message}</td></tr>`;
     }
 
-    // โหลด gapi เมื่อหน้าเว็บโหลด
     window.onload = loadGapiAndInit;
   </script>
 </body>
