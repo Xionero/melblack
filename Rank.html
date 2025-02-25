@@ -26,6 +26,7 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
       overflow: hidden;
       border-radius: 10px;
+      background-color: #1e1e1e; /* Dark table background */
     }
 
     th, td {
@@ -34,15 +35,11 @@
       border-bottom: 1px solid #333;
     }
 
-     th:first-child, td:first-child { /* Column A (Rank) */
-      width: 60px; /* Fixed width for rank */
-      text-align: center; /* Center rank number */
-    }
-    th:nth-child(2), td:nth-child(2) { /* Column B (Name) */
-        width: 70%; /*  column name */
+    th:first-child, td:first-child { /* Column A (Name) */
+      width: 70%; /*  column name */
     }
 
-    th:last-child, td:last-child { /* Column C (Score) */
+    th:last-child, td:last-child { /* Column B (Score) */
       width: 100px; /* Fixed width for score */
       text-align: center;
     }
@@ -53,30 +50,27 @@
       font-weight: bold;
       text-transform: uppercase;
     }
-
-    /* Custom row colors based on rank */
-    tbody tr:nth-child(1) { /* Rank 1 */
-      background: linear-gradient(to bottom, #ff8c00 0%, #e67e22 100%); /* Orange */
-    }
-    tbody tr:nth-child(2) { /* Rank 2 */
-      background: linear-gradient(to bottom, #9b59b6 0%, #8e44ad 100%); /* Purple */
-    }
-    tbody tr:nth-child(3) { /* Rank 3 */
-      background: linear-gradient(to bottom, #3498db 0%, #2980b9 100%); /* Blue */
-    }
-    tbody tr:nth-child(4) { /* Rank 4 */
-      background: linear-gradient(to bottom, #2ecc71 0%, #27ae60 100%); /* Green */
-    }
-    tbody tr:nth-child(n+5) { /* Rank 5 and below */
-      background: linear-gradient(to bottom, #f5f5f5 0%, #e0e0e0 100%); /* Light Grey */
-       color:#252525;
-
-    }
-
      tbody tr:hover{
-        background: linear-gradient(to bottom, #444444 0%, #303030 100%);
+        background-color:#303030;
         /* Brighter on hover */
         cursor: pointer; /* Change cursor on hover */
+    }
+
+    /* Text colors based on rank */
+    tbody tr:nth-child(1) td { /* Rank 1 */
+      color: #ff8c00; /* Orange */
+    }
+    tbody tr:nth-child(2) td { /* Rank 2 */
+      color: #9b59b6; /* Purple */
+    }
+    tbody tr:nth-child(3) td { /* Rank 3 */
+      color: #3498db; /* Blue */
+    }
+    tbody tr:nth-child(4) td { /* Rank 4 */
+      color: #2ecc71; /* Green */
+    }
+    tbody tr:nth-child(n+5) td { /* Rank 5 and below */
+        color: #fff;
     }
 
     /* Styling for error messages */
@@ -85,11 +79,6 @@
       text-align: center;
       margin-top: 1rem;
     }
-      /* Darker text on light background */
-    tbody tr:nth-child(n+5) td {
-        color: #252525;
-    }
-
 
   </style>
   <script src="https://apis.google.com/js/api.js"></script>
@@ -99,7 +88,6 @@
   <table id="data-table">
     <thead>
       <tr>
-        <th>Rank</th>
         <th>ชื่อ</th>
         <th>คะแนน</th>
       </tr>
@@ -134,12 +122,12 @@
     function fetchSheetData() {
       gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: spreadsheetId,
-        range: 'rank!A:C', // Fetch Rank, Name, and Score (A, B, C)
+        range: 'rank!A:B', // Fetch Name and Score (A, B)
       }).then(function(response) {
         let values = response.result.values;
         if (values && values.length > 0) {
-           // Sort by score (column C, index 2) in descending order
-          values.sort((a, b) => parseInt(b[2]) - parseInt(a[2]));
+          // Sort by score (column B, index 1) in descending order
+          values.sort((a, b) => parseInt(b[1]) - parseInt(a[1]));
 
           // Limit to top 10
           values = values.slice(0, 10);
@@ -153,20 +141,16 @@
       });
     }
 
-
     function displayData(values) {
       const tableBody = document.querySelector('#data-table tbody');
       tableBody.innerHTML = '';
 
       values.forEach((row, index) => {
         const rank = index + 1; // Calculate rank based on sorted position
-        const name = row[1]; // Name is now in the second column (index 1)
-        const score = row[2] ? row[2] : 0; // Score is in the third column (index 2), handle missing scores
+        const name = row[0]; // Name is in the first column (index 0)
+        const score = row[1] ? row[1] : 0; // Score is in the second column (index 1)
 
         const newRow = document.createElement('tr');
-        const rankCell = document.createElement('td');
-        rankCell.textContent = rank;
-        newRow.appendChild(rankCell);
         const nameCell = document.createElement('td');
         nameCell.textContent = name;
         newRow.appendChild(nameCell);
@@ -178,11 +162,10 @@
       });
     }
 
-     function displayError(message) {
-        const tableBody = document.querySelector('#data-table tbody');
-        tableBody.innerHTML = `<tr><td colspan="3" class="error-message">${message}</td></tr>`; // colspan=3
+    function displayError(message) {
+      const tableBody = document.querySelector('#data-table tbody');
+      tableBody.innerHTML = `<tr><td colspan="2" class="error-message">${message}</td></tr>`; // colspan=2
     }
-
 
     window.onload = loadGapiAndInit;
   </script>
