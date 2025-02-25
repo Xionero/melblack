@@ -20,12 +20,12 @@
 
     table {
       border-collapse: collapse;
-      width: 90%; /* Wider table */
-      max-width: 800px; /* Limit maximum width */
+      width: 100%; /* Wider table */
+      max-width: 400px; /* Limit maximum width */
       margin: 0 auto; /* Center the table */
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
       overflow: hidden;
-      border-radius: 10px;
+      border-radius: 4px;
       background-color: #1e1e1e; /* Dark table background */
     }
 
@@ -37,6 +37,10 @@
 
     th:first-child, td:first-child { /* Column A (Name) */
       width: 70%; /*  column name */
+       max-width: 200px; /* Limit name column width */
+       overflow: hidden;
+       text-overflow: ellipsis; /* Add ellipsis for long names */
+      white-space: nowrap;
     }
 
     th:last-child, td:last-child { /* Column B (Score) */
@@ -88,8 +92,8 @@
   <table id="data-table">
     <thead>
       <tr>
-        <th>ชื่อ</th>
-        <th>คะแนน</th>
+        <th>Label</th>
+        <th>Score</th>
       </tr>
     </thead>
     <tbody>
@@ -140,6 +144,13 @@
         displayError("Error fetching data: " + error.result.error.message);
       });
     }
+    //ตัดขื่อ
+    function truncateName(name) {
+      if (name.length > 20) {
+        return name.substring(0, 20) + '...'; // ตัดและเพิ่ม "..."
+      }
+      return name;
+    }
 
     function displayData(values) {
       const tableBody = document.querySelector('#data-table tbody');
@@ -147,7 +158,8 @@
 
       values.forEach((row, index) => {
         const rank = index + 1; // Calculate rank based on sorted position
-        const name = row[0]; // Name is in the first column (index 0)
+        //const name = row[0]; // Name is in the first column (index 0)
+        const name = truncateName(row[0]); // ใช้ฟังก์ชัน truncateName
         const score = row[1] ? row[1] : 0; // Score is in the second column (index 1)
 
         const newRow = document.createElement('tr');
