@@ -7,7 +7,7 @@
       font-family: sans-serif;
       background-color: #121212; /* Dark background */
       color: #eee; /* Light text */
-      margin: 0; /* Remove default margin */
+      margin: 0;
       padding: 0;
     }
 
@@ -15,53 +15,81 @@
       text-align: center;
       margin-top: 2rem;
       margin-bottom: 1rem;
-      color: #ddd; /* Slightly darker text for heading */
+      color: #ddd;
     }
 
     table {
       border-collapse: collapse;
-      width: 80%; /* Wider table */
+      width: 90%; /* Wider table */
       max-width: 800px; /* Limit maximum width */
       margin: 0 auto; /* Center the table */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Add a subtle shadow */
-      overflow: hidden; /* Hide any overflowing content (for rounded corners) */
-      border-radius: 10px; /* Rounded corners */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      border-radius: 10px;
     }
 
     th, td {
-      padding: 12px 15px; /* More padding */
+      padding: 12px 15px;
       text-align: left;
-      border-bottom: 1px solid #333; /* Darker border */
+      border-bottom: 1px solid #333;
+    }
+
+     th:first-child, td:first-child { /* Column A (Rank) */
+      width: 60px; /* Fixed width for rank */
+      text-align: center; /* Center rank number */
+    }
+    th:nth-child(2), td:nth-child(2) { /* Column B (Name) */
+        width: 70%; /*  column name */
+    }
+
+    th:last-child, td:last-child { /* Column C (Score) */
+      width: 100px; /* Fixed width for score */
+      text-align: center;
     }
 
     th {
-      background-color: #252525; /* Darker header background */
-      color: #fff; /* White text for header */
+      background-color: #252525;
+      color: #fff;
       font-weight: bold;
-      text-transform: uppercase; /* Uppercase header text */
+      text-transform: uppercase;
     }
 
-    /* Gradient background for table rows */
-    tbody tr {
-      background: linear-gradient(to bottom, #2c2c2c 0%, #1e1e1e 100%); /* Subtle gradient */
+    /* Custom row colors based on rank */
+    tbody tr:nth-child(1) { /* Rank 1 */
+      background: linear-gradient(to bottom, #ff8c00 0%, #e67e22 100%); /* Orange */
+    }
+    tbody tr:nth-child(2) { /* Rank 2 */
+      background: linear-gradient(to bottom, #9b59b6 0%, #8e44ad 100%); /* Purple */
+    }
+    tbody tr:nth-child(3) { /* Rank 3 */
+      background: linear-gradient(to bottom, #3498db 0%, #2980b9 100%); /* Blue */
+    }
+    tbody tr:nth-child(4) { /* Rank 4 */
+      background: linear-gradient(to bottom, #2ecc71 0%, #27ae60 100%); /* Green */
+    }
+    tbody tr:nth-child(n+5) { /* Rank 5 and below */
+      background: linear-gradient(to bottom, #f5f5f5 0%, #e0e0e0 100%); /* Light Grey */
+       color:#252525;
+
     }
 
-    tbody tr:nth-child(odd) {
-      background: linear-gradient(to bottom, #303030 0%, #222222 100%);  /*slightly different odd row*/
-    }
-    tbody tr:hover{
+     tbody tr:hover{
         background: linear-gradient(to bottom, #444444 0%, #303030 100%);
         /* Brighter on hover */
         cursor: pointer; /* Change cursor on hover */
     }
 
-
     /* Styling for error messages */
     .error-message {
-      color: #ff6347; /* Tomato color for errors */
+      color: #ff6347;
       text-align: center;
       margin-top: 1rem;
     }
+      /* Darker text on light background */
+    tbody tr:nth-child(n+5) td {
+        color: #252525;
+    }
+
 
   </style>
   <script src="https://apis.google.com/js/api.js"></script>
@@ -73,6 +101,7 @@
       <tr>
         <th>Rank</th>
         <th>ชื่อ</th>
+        <th>คะแนน</th>
       </tr>
     </thead>
     <tbody>
@@ -82,8 +111,8 @@
 
   <script>
     // Replace with your API key and Spreadsheet ID
-    const apiKey = 'AIzaSyBeRiZ-yYa2S-FKzJJ_dNmtbYBtQwYpyGQ'; // Put your API Key here
-    const spreadsheetId = '1QEnV5yZF_Suln7jJUNQSk2dJPloOX-GucxdKXaXCidw'; // Spreadsheet ID
+    const apiKey = 'AIzaSyBeRiZ-yYa2S-FKzJJ_dNmtbYBtQwYpyGQ';
+    const spreadsheetId = '1QEnV5yZF_Suln7jJUNQSk2dJPloOX-GucxdKXaXCidw';
 
     function loadGapiAndInit() {
       gapi.load('client', initClient);
@@ -105,10 +134,16 @@
     function fetchSheetData() {
       gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: spreadsheetId,
-        range: 'rank!A:B', // Assuming your sheet is named 'rank'
+        range: 'rank!A:C', // Fetch Rank, Name, and Score (A, B, C)
       }).then(function(response) {
-        const values = response.result.values;
+        let values = response.result.values;
         if (values && values.length > 0) {
+           // Sort by score (column C, index 2) in descending order
+          values.sort((a, b) => parseInt(b[2]) - parseInt(a[2]));
+
+          // Limit to top 10
+          values = values.slice(0, 10);
+
           displayData(values);
         } else {
           displayError("No data found in the 'rank' sheet.");
@@ -118,13 +153,15 @@
       });
     }
 
+
     function displayData(values) {
       const tableBody = document.querySelector('#data-table tbody');
-      tableBody.innerHTML = ''; // Clear previous data
+      tableBody.innerHTML = '';
 
-      values.forEach(row => {
-        const rank = row[0];
-        const name = row[1];
+      values.forEach((row, index) => {
+        const rank = index + 1; // Calculate rank based on sorted position
+        const name = row[1]; // Name is now in the second column (index 1)
+        const score = row[2] ? row[2] : 0; // Score is in the third column (index 2), handle missing scores
 
         const newRow = document.createElement('tr');
         const rankCell = document.createElement('td');
@@ -133,16 +170,19 @@
         const nameCell = document.createElement('td');
         nameCell.textContent = name;
         newRow.appendChild(nameCell);
+        const scoreCell = document.createElement('td');
+        scoreCell.textContent = score;
+        newRow.appendChild(scoreCell);
 
         tableBody.appendChild(newRow);
       });
     }
 
-
-    function displayError(message) {
+     function displayError(message) {
         const tableBody = document.querySelector('#data-table tbody');
-        tableBody.innerHTML = `<tr><td colspan="2" class="error-message">${message}</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="3" class="error-message">${message}</td></tr>`; // colspan=3
     }
+
 
     window.onload = loadGapiAndInit;
   </script>
