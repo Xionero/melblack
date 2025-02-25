@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>แสดงข้อมูล Rank จาก Google Sheet</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 50%;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+  <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+  <h1>ข้อมูล Rank</h1>
+  <table id="data-table">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>ชื่อ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ข้อมูลจะถูกใส่ที่นี่ -->
+    </tbody>
+  </table>
+
+  <script>
+    // 1. ค่าที่ต้องแก้ไข:
+    const apiKey = 'AIzaSyBeRiZ-yYa2S-FKzJJ_dNmtbYBtQwYpyGQ'; // API Key ของคุณ
+    const spreadsheetId = '1QEnV5yZF_Suln7jJUNQSk2dJPloOX-GucxdKXaXCidw'; // Spreadsheet ID
+
+    // 2. ฟังก์ชันโหลด gapi และเริ่มต้น
+    function loadGapiAndInit() {
+      gapi.load('client', initClient);
+    }
+
+    // 3. ฟังก์ชันเริ่มต้น (หลังจาก gapi โหลดแล้ว)
+    function initClient() {
+      gapi.client.init({
+        apiKey: apiKey,
+        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+      }).then(function () {
+        // API พร้อมใช้งาน
+        console.log("Google Sheets API is ready!");
+        fetchSheetData();
+      }, function(error) {
+        console.error("Error initializing API:", error);
+        displayError("เกิดข้อผิดพลาดในการโหลด API: " + error.message);
+      });
+    }
+
+    // 4. ฟังก์ชันดึงข้อมูล
+    function fetchSheetData() {
+      gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: spreadsheetId,
+        range: 'rank!A:B', //  <--- เปลี่ยนตรงนี้:  ใช้ 'rank!A:B'
+      }).then(function(response) {
+        const values = response.result.values;
+        if (values && values.length > 0) {
+          displayData(values);
+        } else {
+          displayError("ไม่พบข้อมูลในชีต rank"); // ข้อความ error ที่เฉพาะเจาะจงขึ้น
+        }
+      }, function(error) {
+        displayError("เกิดข้อผิดพลาดในการดึงข้อมูล: " + error.result.error.message);
+      });
+    }
+
+
+    // 5. ฟังก์ชันแสดงผลข้อมูล
+    function displayData(values) {
+       const tableBody = document.querySelector('#data-table tbody');
+       tableBody.innerHTML = '';  // ล้างข้อมูลเก่า
+
+      values.forEach(row => { //วน loop แต่ละ row
+          const rank = row[0];
+          const name = row[1];
+
+           // สร้าง table row
+          const newRow = document.createElement('tr');
+
+           // สร้าง table data cell สำหรับ rank
+          const rankCell = document.createElement('td');
+          rankCell.textContent = rank;
+          newRow.appendChild(rankCell);
+
+              // สร้าง table data cell สำหรับ name
+          const nameCell = document.createElement('td');
+          nameCell.textContent = name;
+          newRow.appendChild(nameCell);
+
+          tableBody.appendChild(newRow); // เพิ่ม row เข้าไปใน tbody
+      });
+    }
+    // 6. ฟังก์ชันแสดง error (ปรับปรุง)
+    function displayError(message) {
+      const tableBody = document.querySelector('#data-table tbody');
+      tableBody.innerHTML = `<tr><td colspan="2">${message}</td></tr>`;
+    }
+
+    // โหลด gapi เมื่อหน้าเว็บโหลด
+    window.onload = loadGapiAndInit;
+  </script>
+</body>
+</html>
