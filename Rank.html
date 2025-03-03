@@ -88,6 +88,7 @@
   <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
+  <h1>Rank</h1>
   <table id="data-table">
     <thead>
       <tr>
@@ -115,7 +116,8 @@
         discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
       }).then(function () {
         console.log("Google Sheets API is ready!");
-        fetchSheetData();
+        //fetchSheetData(); // เอาออกจากการโหลดตอนแรก
+        setInterval(fetchSheetData, 1000); // Set interval to 1 second (1000 milliseconds)
       }, function(error) {
         console.error("Error initializing API:", error);
         displayError("Failed to load API: " + error.message);
