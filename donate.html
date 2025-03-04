@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รูปภาพพร้อมคำอธิบาย</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@400;500&display=swap');
+        
+        body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* จัดเนื้อหาให้อยู่บนสุด */
+    height: 100vh;
+    margin: 0;
+    font-family: 'Prompt', sans-serif; /* ใช้ฟอนต์ Prompt */
+    padding-top: 20px; /* เพิ่มระยะห่างจากด้านบน */
+    overflow: hidden; /* เอาการเลื่อนออก */
+
+    background-color: transparent;
+    background-size: cover; /* ทำให้รูปภาพเต็มพื้นที่ */
+    background-position: center; /* จัดตำแหน่งรูปภาพให้อยู่ตรงกลาง */
+    background-repeat: no-repeat; /* ไม่ให้รูปภาพซ้ำ */
+}
+
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            text-align: center;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .image-row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .image-row img {
+            width: 300px;
+            height: auto;
+        }
+
+        .image-row p {
+            font-size: 1.5rem;
+            margin-top: -15px; /* ลดระยะห่างระหว่างรูปภาพกับตัวหนังสือ */
+            transition: transform 0.3s ease;
+        }
+
+        .image-row:hover {
+            transform: scale(1.05);
+        }
+
+        .image-row a {
+            text-decoration: none;
+            color: black;
+        }
+
+        .image-row a:hover {
+            color: blue;
+        }
+        .highlight-text {
+  color: rgb(255, 255, 255); /* เปลี่ยนเป็นสีที่ต้องการ */
+  font-weight: bold; /* ทำตัวหนา */
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-row">
+            <a href="https://e.tip.in.th/site/index/1349" target="_blank">
+                <img src="image/donate1.png" alt="รูปที่ 1">
+            </a>
+        </div>
+        <div class="image-row">
+             <a href="https://tipme.in.th/adba897fb2a0a8e415402f54" target="_blank">
+                <img src="image/donate2.png" alt="รูปที่ 2">
+            </a>
+        </div>
+    </div>
+</body>
+</html>

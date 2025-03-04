@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&display=swap');
+
+        body {
+            background-size: cover;
+            background-color: transparent;
+            font-family: 'Comic Neue', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: rgba(53, 53, 53, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+            position: relative;
+            display: block;
+            flex-direction: column;
+            align-items: center;
+            height: 450px;
+            overflow: hidden; /* Add this line */
+        }
+
+        form::before {
+            content: "";
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 150px;
+            height: 150px;
+            background-size: contain;
+            opacity: 0.4;
+            z-index: 1;
+        }
+
+        form > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        form .main-container {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        form .image-container {
+            width: 200px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        form .image-container img {
+            max-width: 100%;
+            height: 325px;
+        }
+
+        form input {
+            font-size: 1.0em;
+            display: block;
+            width: calc(250px - 20px);
+            padding: 3px;
+            margin: 5px 0;
+            border: 2px solid rgb(151, 151, 151);
+            border-radius: 3px;
+            box-sizing: border-box;
+            background: #464545;
+            color: #ffffff;
+        }
+
+        form input::placeholder {
+            color: #aaa;
+        }
+
+        form input[type="submit"] {
+            background-color: #ff2767;
+            color: #ffffff;
+            border: none;
+            padding: 15px 55px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            width: auto;
+            position: absolute;
+            bottom: 20px;
+            left: 270px;
+            transform: translateX(-50%);
+        }
+
+        form input[type="submit"]:hover {
+            background-color: #ff004c;
+        }
+
+        form #demo {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        
+        form #youtube-name-container {
+            position: absolute;
+            top: 16px;
+            left: 310px;
+            transform: translateX(-50%);
+        }
+
+        form #answer1-container {
+            position: absolute;
+            top: 88px;
+            left: 210px;
+        }
+
+        form #answer2-container {
+            position: absolute;
+            top: 170px;
+            left: 210px;
+        }
+
+        form #answer3-container {
+            position: absolute;
+            top: 253px;
+            left: 210px;
+        }
+
+        form #answer4-container {
+            position: absolute;
+            top: 337px;
+            left: 210px;
+        }
+
+        form .answer-group {
+            width: 300px;
+        }
+        .swal2-container.no-overlay {
+            background-color: transparent !important;
+        }
+    </style>
+</head>
+<body>
+    <form action="" method="post" onsubmit="validateAndSubmitForm(event);" accept-charset="UTF-8" autocomplete="off" name="question">
+
+        <div class="main-container">
+            <div class="image-container">
+                <img src="https://xionero.github.io/melblack/game.jpg" alt="Main Image">
+            </div>
+
+            <div class="answers-container">
+
+            </div>
+        </div>
+
+        <div class="answer-group" id="youtube-name-container">
+            <input type="text" id="sender" name="youtube_name" placeholder="ชื่อของคุณ" required>
+        </div>
+        <div class="answer-group" id="answer1-container">
+            <input id="answer1" name="answer1" placeholder="คำตอบ 1">
+        </div>
+        <div class="answer-group" id="answer2-container">
+            <input id="answer2" name="answer2" placeholder="คำตอบ 2">
+        </div>
+        <div class="answer-group" id="answer3-container">
+            <input id="answer3" name="answer3" placeholder="คำตอบ 3">
+        </div>
+        <div class="answer-group" id="answer4-container">
+            <input id="answer4" name="answer4" placeholder="คำตอบ 4">
+        </div>
+
+        <input type="submit" value="ส่ง" id="submitButton">
+
+        <p id="demo"></p>
+    </form>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxSvA4pVhpUk4BsBNMtlpRtB67XcZLqhvsatiHbPAvvHDlDBfPIkHJzzaMcyF8oZjJK/exec';
+        const form = document.forms['question'];
+        const submitButton = document.getElementById('submitButton'); // Get the submit button
+
+        function validateAndSubmitForm(event) {
+            event.preventDefault();
+            const answer1 = document.getElementById('answer1').value.trim();
+            const answer2 = document.getElementById('answer2').value.trim();
+            const answer3 = document.getElementById('answer3').value.trim();
+            const answer4 = document.getElementById('answer4').value.trim();
+
+            if (answer1 === '' && answer2 === '' && answer3 === '' && answer4 === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'กรุณาตอบคำถามอย่างน้อยหนึ่งข้อ',
+                });
+                return false;
+            }
+
+            submitForm();
+        }
+
+        function submitForm() {
+            Swal.fire({
+                title: 'ยืนยันการส่งหรือไม่?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'ยืนยัน',
+                cancelButtonText: 'ยกเลิก',
+                customClass: {
+                container: 'no-overlay' // กำหนด class 'no-overlay' ให้กับ container
+            }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Disable the submit button
+                    submitButton.disabled = true;
+                    submitButton.style.backgroundColor = '#ccc'; //optional: change the button's appearance to indicate it's disabled
+                    submitButton.style.cursor = 'not-allowed'; //optional: change cursor
+
+                    fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.text().then(text => {
+                                    throw new Error('HTTP error! Status: ' + response.status + ', ' + text);
+                                });
+                            }
+                            return response.json(); // Parse JSON
+                        })
+                        .then(data => {
+                            //Re-enable button after success
+                            submitButton.disabled = false;
+                            submitButton.style.backgroundColor = '#ff2767'; //Restore original color
+                            submitButton.style.cursor = 'pointer'; //Restore cursor
+
+                            if (data.result === "success") { // ตรวจสอบ result
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'ส่งเรียบร้อยแล้ว',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    customClass: {
+                                    container: 'no-overlay' // กำหนด class 'no-overlay' ให้กับ container
+                                  }
+                                 });
+                                form.reset();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'เกิดข้อผิดพลาด',
+                                    text: data.error || 'Unknown error', // แสดง error message จาก Apps Script
+                                    timer: 3000,
+                                    customClass: {
+                                    container: 'no-overlay' // กำหนด class 'no-overlay' ให้กับ container
+                                  }
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            //Re-enable button after failure
+                            submitButton.disabled = false;
+                            submitButton.style.backgroundColor = '#ff2767'; //Restore original color
+                            submitButton.style.cursor = 'pointer'; //Restore cursor
+
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'เกิดข้อผิดพลาด',
+                                text: error.message
+                            });
+                        });
+                } else {
+                  //If cancel is pressed, still re-enable the button
+                  submitButton.disabled = false;
+                  submitButton.style.backgroundColor = '#ff2767'; //Restore original color
+                  submitButton.style.cursor = 'pointer'; //Restore cursor
+                }
+            });
+        }
+    </script>
+</body>
+</html>
