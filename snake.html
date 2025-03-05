@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game - Retro Edition</title>
+    <style>
+        body {
+    background-color: #222;
+    color: #eee;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.game-wrapper {
+    display: flex;
+    gap: 20px; /* Space between game and leaderboard */
+}
+
+.container {
+    text-align: center;
+}
+
+#gameCanvas {
+    background-color: #111;
+    border: 4px solid #555;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+.score, .speed {
+    margin-top: 10px;
+    font-size: 1.2em;
+}
+
+.leaderboard {
+    background-color: #333;
+    padding: 20px;
+    border-radius: 5px;
+    width: 200px;
+}
+
+.leaderboard h2 {
+    margin-top: 0;
+    color: #fff;
+}
+
+.leaderboard ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.leaderboard li {
+    padding: 5px 0;
+    border-bottom: 1px solid #555;
+}
+
+.leaderboard li:last-child {
+    border-bottom: none;
+}
+    </style>
+</head>
+<body>
+    <div class="game-wrapper">
+        <div class="container">
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+        </div>
+        <div class="leaderboard">
+            <h2>Leaderboard</h2>
+            <ul id="scoreList">
+                <li>Loading...</li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const scoreList = document.getElementById("scoreList");
+
+// ขนาดของช่อง (grid)
+const gridSize = 20;
+// จำนวนช่องในแนวแกน x และ y
+const gridWidth = canvas.width / gridSize;
+const gridHeight = canvas.height / gridSize;
+
+// งู
+let snake = [{ x: 10, y: 10 }];
+let dx = 1; // ทิศทางการเคลื่อนที่ของงู (1 = ขวา, -1 = ซ้าย, 0 = ไม่เคลื่อนที่)
+let dy = 0;
+
+// อาหาร
+let food = { x: 5, y: 5 };
+
+// คะแนน
+let score = 0;
+
+// สถานะเกมและชื่อผู้เล่น
+let gameRunning = false;
+let playerName = "";
+
+// ความเร็วเกมและการควบคุมเวลา
+const gameSpeed = 100; // ความเร็วคงที่ (มิลลิวินาทีต่อการอัปเดต)
+let lastUpdate = 0;   // เวลาของการอัปเดตล่าสุด
+
+// สร้าง Popup
+const popupContainer = document.createElement("div");
+popupContainer.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top */
+`;
+
+const popupContent = document.createElement("div");
+popupContent.style.cssText = `
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+`;
+
+const nameInput = document.createElement("input");
+nameInput.type = "text";
+nameInput.placeholder = "Enter your name";
+nameInput.style.margin = "10px";
+
+const startButton = document.createElement("button");
+startButton.textContent = "Start Game";
+startButton.style.cssText = `
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+`;
+
+popupContent.appendChild(nameInput);
+popupContent.appendChild(startButton);
+popupContainer.appendChild(popupContent);
+document.body.appendChild(popupContainer);
+
+// ฟังก์ชันวาดงู
+function drawSnake() {
+    snake.forEach(part => {
+        ctx.fillStyle = "green";
+        ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize, gridSize);
+        ctx.strokeStyle = "black";
+        ctx.strokeRect(part.x * gridSize, part.y * gridSize, gridSize, gridSize);
+    });
+}
+
+// ฟังก์ชันวาดอาหาร
+function drawFood() {
+    ctx.fillStyle = "red";
+    ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+}
+
+// ฟังก์ชันสร้างอาหารในตำแหน่งสุ่ม
+function generateFood() {
+    let newFood;
+    let overlapping;
+
+    do {
+        newFood = {
+            x: Math.floor(Math.random() * gridWidth),
+            y: Math.floor(Math.random() * gridHeight)
+        };
+
+        overlapping = false;
+        for (let i = 0; i < snake.length; i++) {
+            if (newFood.x === snake[i].x && newFood.y === snake[i].y) {
+                overlapping = true;
+                break;
+            }
+        }
+    } while (overlapping);
+
+    food = newFood;
+}
+
+// ฟังก์ชันอัปเดตตำแหน่งของงู
+function update(timestamp) {
+    if (!gameRunning) return;
+
+    if (!lastUpdate) lastUpdate = timestamp; // Initialize lastUpdate on first frame
+    const deltaTime = timestamp - lastUpdate;
+
+    if (deltaTime > gameSpeed) {
+        lastUpdate = timestamp;
+
+        // ล้าง Canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // คำนวณตำแหน่งหัวงูใหม่
+        const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+        // ตรวจสอบการชนกับขอบ
+        if (head.x < 0) {
+            head.x = gridWidth - 1;
+        } else if (head.x >= gridWidth) {
+            head.x = 0;
+        }
+        if (head.y < 0) {
+            head.y = gridHeight - 1;
+        } else if (head.y >= gridHeight) {
+            head.y = 0;
+        }
+
+        // ตรวจสอบการชนกับตัวเอง
+        for (let i = 1; i < snake.length; i++) {
+            if (head.x === snake[i].x && head.y === snake[i].y) {
+                gameOver();
+                return;
+            }
+        }
+
+        // เพิ่มหัวงูใหม่
+        snake.unshift(head);
+
+        // ตรวจสอบการกินอาหาร
+        if (head.x === food.x && head.y === food.y) {
+            score++;
+            generateFood();
+        } else {
+            // ตัดส่วนหางของงูออก
+            snake.pop();
+        }
+
+        // วาดงูและอาหาร
+        drawFood();
+        drawSnake();
+
+    }
+
+    requestAnimationFrame(update); // ใช้ requestAnimationFrame แทน setInterval
+}
+
+// ฟังก์ชันจบเกม
+function gameOver() {
+    gameRunning = false;
+    //clearInterval(intervalId); // ไม่ต้องใช้ clearInterval แล้ว เพราะใช้ requestAnimationFrame
+
+    // Create Game Over Popup
+    const gameOverPopupContainer = document.createElement("div");
+    gameOverPopupContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1001; /* Higher than the name input popup */
+    `;
+
+    const gameOverPopupContent = document.createElement("div");
+    gameOverPopupContent.style.cssText = `
+        background-color: black;
+        padding: 20px;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 20px;
+    `;
+
+    const gameOverText = document.createElement("p");
+    gameOverText.textContent = `Game Over! Your score: ${score}`;
+    gameOverPopupContent.appendChild(gameOverText);
+
+    // Create Retry Button
+    const retryButton = document.createElement("button");
+    retryButton.textContent = "Retry";
+    retryButton.style.cssText = `
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+    `;
+    retryButton.addEventListener("click", () => {
+        document.body.removeChild(gameOverPopupContainer);
+        resetGame();
+        startGame();  // Restart the game
+    });
+    gameOverPopupContent.appendChild(retryButton);
+
+        // Create Quit Button
+        const quitButton = document.createElement("button");
+    quitButton.textContent = "Quit";
+    quitButton.style.cssText = `
+        padding: 10px 20px;
+        background-color: #f44336; /* Red color */
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        margin-left: 10px;
+    `;
+    quitButton.addEventListener("click", () => {
+        document.body.removeChild(gameOverPopupContainer);
+        resetGame();
+        popupContainer.style.display = "flex"; // Show the name input popup again
+    });
+    gameOverPopupContent.appendChild(quitButton);
+
+
+
+    gameOverPopupContainer.appendChild(gameOverPopupContent);
+    document.body.appendChild(gameOverPopupContainer);
+
+    saveScore(playerName, score); // บันทึกชื่อและคะแนน
+
+}
+
+function resetGame() {
+    snake = [{ x: 10, y: 10 }];
+    dx = 1;
+    dy = 0;
+    score = 0;
+    generateFood();
+    lastUpdate = 0; // Reset lastUpdate when restarting the game
+}
+
+// ควบคุมทิศทางด้วยปุ่มลูกศร
+let lastInputTime = 0;
+const inputDelay = 50; // มิลลิวินาที
+
+document.addEventListener("keydown", event => {
+    const now = Date.now();
+    if (now - lastInputTime < inputDelay) {
+        return; // Ignore input if it's too soon
+    }
+
+    lastInputTime = now;
+
+    switch (event.key) {
+        case "ArrowLeft":
+            if (dx !== 1) {
+                dx = -1;
+                dy = 0;
+            }
+            break;
+        case "ArrowRight":
+            if (dx !== -1) {
+                dx = 1;
+                dy = 0;
+            }
+            break;
+        case "ArrowUp":
+            if (dy !== 1) {
+                dx = 0;
+                dy = -1;
+            }
+            break;
+        case "ArrowDown":
+            if (dy !== -1) {
+                dx = 0;
+                dy = 1;
+            }
+            break;
+    }
+});
+
+// ฟังก์ชันเริ่มเกม
+let intervalId;
+function startGame() {
+    playerName = nameInput.value;
+    if (playerName) {
+        gameRunning = true;
+        snake = [{ x: 10, y: 10 }];
+        dx = 1;
+        dy = 0;
+        score = 0;
+        generateFood();
+        popupContainer.style.display = "none"; // Hide popup
+        lastUpdate = 0; // Reset lastUpdate on game start
+        requestAnimationFrame(update); // Start the game loop with requestAnimationFrame
+
+    } else {
+        alert("Please enter your name to start the game.");
+    }
+}
+
+startButton.addEventListener("click", startGame); // Attach event to the start button
+
+function saveScore(name, score) {
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbztSJm2-P3B_lbKF2pOwK_0K9LUzEtx1M7AQ0U7RDinWb6QPT1r0tC8vee-_65tjT1O/exec'; // แทนที่ด้วย Web App URL ที่คุณ copy มา
+    const data = { name: name, score: score };
+
+    fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors', // เพิ่ม mode: 'no-cors' เพื่อหลีกเลี่ยงปัญหา CORS
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        console.log('Success:', response);
+        fetchScores(); // รีเฟรช Leaderboard หลังจากบันทึกคะแนน
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function fetchScores() {
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzvQ2quz6CYHaHpPCaximxmPVOgxxllp9WhHswHDd_JSWaMbuMiAlcaBOjsroaLmSq6/exec'; //*** URL เดิม
+    const urlWithParam = scriptURL + '?action=getScores';//เพิ่ม parameter action
+
+    fetch(urlWithParam)
+        .then(response => response.json())
+        .then(data => {
+            displayScores(data);
+        })
+        .catch(error => {
+            console.error('Error fetching scores:', error);
+            scoreList.innerHTML = '<li>Error loading scores.</li>';
+        });
+}
+
+function displayScores(scores) {
+    scoreList.innerHTML = ''; // Clear existing list
+    scores.sort((a, b) => b.score - a.score); // Sort by score descending
+
+    scores.forEach(score => {
+        const li = document.createElement('li');
+        li.textContent = `${score.name}: ${score.score}`;
+        scoreList.appendChild(li);
+    });
+}
+
+// โหลดคะแนนเมื่อหน้าเว็บโหลด และรีเฟรชทุก 1 วินาที
+fetchScores();
+setInterval(fetchScores, 1000); // เรียก fetchScores() ทุก 1000 มิลลิวินาที (1 วินาที)
+    </script>
+</body>
+</html>
