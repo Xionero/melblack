@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dual Leaderboards - Retro Edition</title>
+    <style>
+        body {
+            background-color: transparent;
+            color: #eee;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: flex-start;      /* Align to the top */
+            min-height: 70vh;
+            margin: 0;
+            padding-top: 20px; /* Add some space from the top */
+        }
+
+        .leaderboard-container {
+            display: flex;          /* Display leaderboards side-by-side */
+            gap: 20px;                /* Space between leaderboards */
+        }
+
+        .leaderboard {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 5px;
+            width: 200px;
+            text-align: center;
+        }
+
+        .leaderboard h2 {
+            margin-top: 0;
+            color: #fff;
+        }
+
+        .leaderboard ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .leaderboard li {
+            padding: 5px 0;
+            border-bottom: 1px solid #555;
+        }
+
+        .leaderboard li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="leaderboard-container">
+
+        <div class="leaderboard">
+            <h2>งูกินแมว</h2>
+            <ul id="scoreList1">
+                <li>Loading...</li>
+            </ul>
+        </div>
+
+        <div class="leaderboard">
+            <h2>Tetris</h2>
+            <ul id="scoreList2">
+                <li>Loading...</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        const scoreList1 = document.getElementById("scoreList1");
+        const scoreList2 = document.getElementById("scoreList2");
+
+        // Replace with your actual script URLs
+        const scriptURL1 = 'https://script.google.com/macros/s/AKfycbzvQ2quz6CYHaHpPCaximxmPVOgxxllp9WhHswHDd_JSWaMbuMiAlcaBOjsroaLmSq6/exec'; // Replace with your first script URL
+        const scriptURL2 = 'https://script.google.com/macros/s/AKfycbwr88rqcMACr_50qzEP8KJ7rUOpBQdD4byGjEoBgCUSy5YB4iErSNw3O6JDpVTF8bAq/exec'; // Replace with your second script URL
+
+        function fetchScores(scriptURL, scoreListElement) {
+            const urlWithParam = scriptURL + '?action=getScores';
+
+            fetch(urlWithParam)
+                .then(response => response.json())
+                .then(data => {
+                    displayScores(data, scoreListElement);
+                })
+                .catch(error => {
+                    console.error('Error fetching scores:', error);
+                    scoreListElement.innerHTML = '<li>Error loading scores.</li>';
+                });
+        }
+
+        function displayScores(scores, scoreListElement) {
+            scoreListElement.innerHTML = ''; // Clear existing list
+            scores.sort((a, b) => b.score - a.score); // Sort by score descending
+
+            // Only display the top 10 scores
+            const topScores = scores.slice(0, 10);
+
+            topScores.forEach(score => {
+                const li = document.createElement('li');
+                li.textContent = `${score.name}: ${score.score}`;
+                scoreListElement.appendChild(li);
+            });
+        }
+
+        // Load both leaderboards on page load and refresh every 1 second
+        fetchScores(scriptURL1, scoreList1);
+        fetchScores(scriptURL2, scoreList2);
+
+        setInterval(() => {
+            fetchScores(scriptURL1, scoreList1);
+            fetchScores(scriptURL2, scoreList2);
+        }, 1000);
+    </script>
+
+</body>
+</html>
