@@ -286,7 +286,7 @@
         popupContent.classList.add("popup-content");
 
         const gameDescription = document.createElement("p");
-        gameDescription.textContent = "เกมเตตริสกินแมว...ไม่ๆไม่กินแมว W A S D Space";
+        gameDescription.textContent = "เกมเตตริสกินแมว...ไม่ๆไม่กินแมว W A S D";
         gameDescription.style.marginBottom = "10px";
 
         const nameInput = document.createElement("input");
@@ -577,7 +577,7 @@
             gameOverPopupContent.classList.add("popup-content");
 
             const gameOverText = document.createElement("p");
-            gameOverText.textContent = `Game Over! Your score: ${score}`;
+            gameOverText.textContent = `จบแล้ว! คุณได้: ${score}`;
             gameOverPopupContent.appendChild(gameOverText);
 
             const retryButton = document.createElement("button");
@@ -650,10 +650,6 @@
     }
     else if (event.key === 'w') {
         rotatePiece();
-    }
-    else if (event.code === 'Space') {
-        event.preventDefault(); // Prevent scrolling
-        togglePause();
     }
 });
 
