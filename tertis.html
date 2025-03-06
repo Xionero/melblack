@@ -24,6 +24,7 @@
 
         .container {
             text-align: center;
+            position: relative; /* Add relative positioning */
         }
 
         #gameCanvas {
@@ -47,14 +48,14 @@
         }
 
         .score {
-            position: relative; /* Changed from absolute */
+            position: relative;
             background-color: #333;
             padding: 10px;
             border-radius: 5px;
             width: auto;
             text-align: center;
             font-size: 1.1em;
-            margin-top: 10px; /* Added margin */
+            margin-top: 10px;
         }
 
         .score h2 {
@@ -63,14 +64,13 @@
             font-size: 1em;
         }
 
-        /* Styles for the popups */
         .popup-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.0); /* Added a semi-transparent background */
+            background-color: rgba(0, 0, 0, 0.5);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -96,16 +96,71 @@
 
         .popup-content button {
             padding: 10px 20px;
-            background-color: #5cb85c;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             margin-top: 10px;
+            margin-left: 5px;  /* Add left margin */
+            margin-right: 5px; /* Add right margin */
         }
 
         .popup-content button:hover {
+            opacity: 0.8; /* Add hover effect */
+        }
+
+        .popup-content .start-button {
+          background-color: #5cb85c;
+        }
+
+        .popup-content .guest-button {
+          background-color: #3498db;
+        }
+
+        .popup-content .start-button:hover {
             background-color: #4cae4c;
+        }
+
+        .popup-content .guest-button:hover {
+            background-color: #2980b9;
+        }
+
+        #pauseButton {
+            position: absolute;
+            top: 5px; /* Adjust as needed */
+            left: -40px; /* Adjust as needed */
+            padding: 5px 10px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.5em; /* Make the symbol bigger */
+            line-height: 1; /* Vertically center the symbol */
+        }
+
+        #pauseButton:hover {
+          opacity: 0.8;
+        }
+
+        #pauseButton.paused {
+            background-color: rgba(220, 53, 69, 0.7); /* Semi-transparent red */
+        }
+
+        #pauseButton:not(.paused) {
+            background-color: rgba(25, 135, 84, 0.7); /* Semi-transparent green */
+        }
+
+        .guest-button { /* Add this class */
+          margin-top: 10px; /* This is the key */
+        }
+
+        /* Add these styles for retry button */
+        .popup-content .retry-button {
+            background-color: #f39c12; /* or any color you like */
+        }
+
+        .popup-content .retry-button:hover {
+            background-color: #e67e22; /* darker shade on hover */
         }
     </style>
 </head>
@@ -113,6 +168,7 @@
     <div class="game-wrapper">
         <div class="container">
             <canvas id="gameCanvas" width="240" height="400"></canvas>
+            <button id="pauseButton">II</button>
         </div>
         <div class="right-panel">
             <div class="next-piece">
@@ -128,16 +184,18 @@
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
-        const scoreList = document.getElementById("scoreList");
         const nextPieceCanvas = document.getElementById("nextPieceCanvas");
         const nextPieceCtx = nextPieceCanvas.getContext("2d");
         const currentScoreDisplay = document.getElementById("currentScore");
+        const pauseButton = document.getElementById("pauseButton");
 
         // Game constants
         const gridWidth = 12;
-        const gridHeight = 20;
+        const visibleGridHeight = 20; // Height of the visible playing field
+        const hiddenRows = 2; // Number of hidden rows at the top for piece entry
+        const gridHeight = visibleGridHeight + hiddenRows; // Total grid height
         const blockSize = 20;
-        const nextPieceBlockSize = 20; // Define the block size for the next piece display
+        const nextPieceBlockSize = 20;
 
         // Colors for the tetris pieces
         const colors = [
@@ -183,7 +241,7 @@
             [0, 0, 0]]
         ];
 
-        // Rotation rules for each piece type
+         // Rotation rules for each piece type
         const rotationRules = [
             null,  // 0: Empty
             2,     // 1: Line (2 rotations)
@@ -210,14 +268,15 @@
         // Game state
         let grid = createGrid();
         let currentPiece = generatePiece();
-        let nextPiece = generatePiece(); // Store the next piece
+        let nextPiece = generatePiece();
         let pieceX = 5;
         let pieceY = 0;
         let score = 0;
         let gameRunning = false;
         let playerName = "";
         let dropCounter = 0;
-        let dropInterval = 1000; // Milliseconds between drops
+        let dropInterval = 1000;
+        let isPaused = false;
 
         // Popup elements
         const popupContainer = document.createElement("div");
@@ -227,7 +286,7 @@
         popupContent.classList.add("popup-content");
 
         const gameDescription = document.createElement("p");
-        gameDescription.textContent = "เกมเตตริสกินแมว...ไม่ๆไม่กินแมว A S D Space";
+        gameDescription.textContent = "เกมเตตริสกินแมว...ไม่ๆไม่กินแมว W A S D Space";
         gameDescription.style.marginBottom = "10px";
 
         const nameInput = document.createElement("input");
@@ -236,10 +295,16 @@
 
         const startButton = document.createElement("button");
         startButton.textContent = "ลุยโลด";
+        startButton.classList.add("start-button"); /* Apply the class */
+
+        const guestButton = document.createElement("button");
+        guestButton.textContent = "ซ้อมเล่น";
+        guestButton.classList.add("guest-button"); /* Apply the class */
 
         popupContent.appendChild(gameDescription);
         popupContent.appendChild(nameInput);
         popupContent.appendChild(startButton);
+        popupContent.appendChild(guestButton);
         popupContainer.appendChild(popupContent);
         document.body.appendChild(popupContainer);
 
@@ -256,12 +321,12 @@
         }
 
         function drawGrid() {
-            for (let y = 0; y < gridHeight; ++y) {
+            for (let y = hiddenRows; y < gridHeight; ++y) { // Start drawing from the first visible row
                 for (let x = 0; x < gridWidth; ++x) {
                     ctx.fillStyle = colors[grid[y][x]] || '#000';
-                    ctx.fillRect(x * blockSize, y * blockSize, blockSize, blockSize);
+                    ctx.fillRect(x * blockSize, (y - hiddenRows) * blockSize, blockSize, blockSize); // Adjust y coordinate for drawing
                     ctx.strokeStyle = '#555';
-                    ctx.strokeRect(x * blockSize, y * blockSize, blockSize, blockSize);
+                    ctx.strokeRect(x * blockSize, (y - hiddenRows) * blockSize, blockSize, blockSize); // Adjust y coordinate for drawing
                 }
             }
         }
@@ -272,9 +337,9 @@
                 for (let x = 0; x < shape[y].length; ++x) {
                     if (shape[y][x]) {
                         ctx.fillStyle = colors[currentPiece];
-                        ctx.fillRect((pieceX + x) * blockSize, (pieceY + y) * blockSize, blockSize, blockSize);
+                        ctx.fillRect((pieceX + x) * blockSize, (pieceY + y - hiddenRows) * blockSize, blockSize, blockSize); // Adjust y coordinate for drawing
                         ctx.strokeStyle = '#555';
-                        ctx.strokeRect((pieceX + x) * blockSize, (pieceY + y) * blockSize, blockSize, blockSize);
+                        ctx.strokeRect((pieceX + x) * blockSize, (pieceY + y - hiddenRows) * blockSize, blockSize, blockSize); // Adjust y coordinate for drawing
                     }
                 }
             }
@@ -311,13 +376,13 @@
                 mergePiece();
                 clearLines();
 
-                currentPiece = nextPiece; // Use the next piece
-                nextPiece = generatePiece(); // Generate a new next piece
+                currentPiece = nextPiece;
+                nextPiece = generatePiece();
 
-                drawNextPiece(); // Draw the updated next piece
+                drawNextPiece();
 
                 pieceX = 5;
-                pieceY = 0;
+                pieceY = hiddenRows > 0 ? hiddenRows - 2 : 0;  // Start piece at a higher hidden row
                 if (collision()) {
                     gameOver();
                 }
@@ -325,22 +390,22 @@
             dropCounter = 0;
         }
 
-        function collision() {
+       function collision() {
             const shape = shapes[currentPiece];
             for (let y = 0; y < shape.length; ++y) {
                 for (let x = 0; x < shape[y].length; ++x) {
-                    if (shape[y][x] !== 0 &&
-                        (grid[y + pieceY] && grid[y + pieceY][x + pieceX]) !== 0) {
-                        return true;
-                    }
-                }
-            }
+                    if (shape[y][x] !== 0) {
+                        const gridY = y + pieceY;
+                        const gridX = x + pieceX;
 
-            for (let y = 0; y < shape.length; ++y) {
-                for (let x = 0; x < shape[y].length; ++x) {
-                    if (shape[y][x] !== 0 &&
-                        (y + pieceY >= gridHeight || x + pieceX < 0 || x + pieceX >= gridWidth)) {
-                        return true;
+                        if (gridY >= gridHeight || gridX < 0 || gridX >= gridWidth || (gridY >= 0 && grid[gridY][gridX] !== 0)) {  // Important: gridY >= 0 check
+                            return true;
+                        }
+
+                        if (gridY < 0) {
+                            continue; //Ignore collision checks in the hidden rows if empty.
+                        }
+
                     }
                 }
             }
@@ -381,7 +446,7 @@
                 }
             }
             score += linesCleared * 100;
-            currentScoreDisplay.textContent = score; // Update the score display
+            currentScoreDisplay.textContent = score;
         }
 
        function rotatePiece() {
@@ -444,9 +509,49 @@
             }
         }
 
-        //Update function
+        function drawGhostPiece() {
+            let ghostY = pieceY;
+            while (true) {
+                ghostY++;
+                const shape = shapes[currentPiece];
+
+                let collisionDetected = false;
+                for (let y = 0; y < shape.length; ++y) {
+                    for (let x = 0; x < shape[y].length; ++x) {
+                         if (shape[y][x] !== 0) {
+                            const gridY = y + ghostY;
+                            const gridX = x + pieceX;
+
+                            if (gridY >= gridHeight || (gridY >= 0 && grid[gridY][gridX] !== 0)) {
+                                collisionDetected = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (collisionDetected) break;
+                }
+
+                if (collisionDetected) {
+                    ghostY--;
+                    break;
+                }
+            }
+
+            const shape = shapes[currentPiece];
+            for (let y = 0; y < shape.length; ++y) {
+                for (let x = 0; x < shape[y].length; ++x) {
+                    if (shape[y][x]) {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)'; // Semi-transparent white
+                        ctx.fillRect((pieceX + x) * blockSize, (ghostY + y - hiddenRows) * blockSize, blockSize, blockSize); // Adjust y coordinate
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                        ctx.strokeRect((pieceX + x) * blockSize, (ghostY + y - hiddenRows) * blockSize, blockSize, blockSize); // Adjust y coordinate
+                    }
+                }
+            }
+        }
+
         function update(time = 0) {
-            if (!gameRunning) return;
+            if (!gameRunning || isPaused) return;
 
             dropCounter += time - lastTime;
             lastTime = time;
@@ -457,15 +562,14 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawGrid();
+            drawGhostPiece();
             drawPiece();
 
             requestAnimationFrame(update);
         }
 
-        // Game Over Function
         function gameOver() {
             gameRunning = false;
-            // Create Game Over Popup
             const gameOverPopupContainer = document.createElement("div");
             gameOverPopupContainer.classList.add("popup-container");
 
@@ -476,24 +580,22 @@
             gameOverText.textContent = `Game Over! Your score: ${score}`;
             gameOverPopupContent.appendChild(gameOverText);
 
-            // Create Retry Button
             const retryButton = document.createElement("button");
             retryButton.textContent = "Retry";
+            retryButton.classList.add("retry-button"); // Assign the class here
             retryButton.addEventListener("click", () => {
                 document.body.removeChild(gameOverPopupContainer);
                 resetGame();
-                // Prevent displaying initial name input again
                 popupContainer.style.display = "none";
-                startGame(); // Use the last playerName to continue the game
+                startGame(playerName !== "");
             });
             gameOverPopupContent.appendChild(retryButton);
 
-            // Create Quit Button
             const quitButton = document.createElement("button");
             quitButton.textContent = "Quit";
             quitButton.style.cssText = `
             padding: 10px 20px;
-            background-color: #f44336; /* Red color */
+            background-color: #f44336;
             color: white;
             border: none;
             border-radius: 5px;
@@ -505,13 +607,16 @@
                 document.body.removeChild(gameOverPopupContainer);
                 resetGame();
                 popupContainer.style.display = "flex";
+                playerName = ""; // Clear the playerName
             });
             gameOverPopupContent.appendChild(quitButton);
 
             gameOverPopupContainer.appendChild(gameOverPopupContent);
             document.body.appendChild(gameOverPopupContainer);
 
-            saveScore(playerName, score);
+            if (playerName !== "Guest") {
+              saveScore(playerName, score);
+            }
         }
 
         function resetGame() {
@@ -519,15 +624,14 @@
             currentPiece = generatePiece();
             nextPiece = generatePiece();
             pieceX = 5;
-            pieceY = 0;
+            pieceY = hiddenRows > 0 ? hiddenRows - 2 : 0;
             score = 0;
             dropCounter = 0;
             dropInterval = 1000;
-            currentScoreDisplay.textContent = score; // Reset score display
-            drawNextPiece(); //Redraw next piece
+            currentScoreDisplay.textContent = score;
+            drawNextPiece();
         }
 
-        // Event listeners
         document.addEventListener('keydown', event => {
     if (!gameRunning) return; // Exit if game is not running
 
@@ -544,40 +648,47 @@
     } else if (event.key === 's') {
         dropPiece();
     }
-    else if (event.key === ' ') {
+    else if (event.key === 'w') {
         rotatePiece();
+    }
+    else if (event.code === 'Space') {
+        event.preventDefault(); // Prevent scrolling
+        togglePause();
     }
 });
 
-        // Start game function
         let lastTime = 0;
-        function startGame() {
-            // Only prompt for name if playerName is empty
-            if (!playerName) {
-                playerName = nameInput.value;
-            }
-            if (playerName) {
-                gameRunning = true;
-                grid = createGrid();
-                currentPiece = generatePiece();
-                nextPiece = generatePiece();
-                pieceX = 5;
-                pieceY = 0;
-                score = 0;
-                dropCounter = 0;
-                dropInterval = 1000;
-                currentScoreDisplay.textContent = score;
+        function startGame(shouldSaveScore) {
+            playerName = nameInput.value || playerName; // Keep existing name if present
 
-                popupContainer.style.display = "none";
-
-                drawNextPiece(); // Draw the initial next piece
-                requestAnimationFrame(update);
-            } else {
+            if (!playerName && !shouldSaveScore) {
                 alert("Please enter your name to start the game.");
+                return;
             }
+
+            gameRunning = true;
+            grid = createGrid();
+            currentPiece = generatePiece();
+            nextPiece = generatePiece();
+            pieceX = 5;
+            pieceY = hiddenRows > 0 ? hiddenRows - 2 : 0; // Start piece at a higher hidden row
+            score = 0;
+            dropCounter = 0;
+            dropInterval = 1000;
+            currentScoreDisplay.textContent = score;
+
+            popupContainer.style.display = "none";
+
+            drawNextPiece();
+            requestAnimationFrame(update);
         }
 
-        startButton.addEventListener("click", startGame);
+        startButton.addEventListener("click", () => startGame(true));
+
+        guestButton.addEventListener("click", () => {
+            playerName = "Guest";
+            startGame(false); // Don't save score
+        });
 
         function saveScore(name, score) {
             const scriptURL = 'https://script.google.com/macros/s/AKfycbz3F0lbWE_RQBt7sTTthd4hKfBuRyV5Ri_EEHeh3ChLJ-RjM_XOGEgoqJY-IJhgCw57/exec';
@@ -585,7 +696,7 @@
 
             fetch(scriptURL, {
                 method: 'POST',
-                mode: 'no-cors', // Add mode: 'no-cors' to avoid CORS issue
+                mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -593,12 +704,25 @@
             })
             .then(response => {
                 console.log('Success:', response);
-                // fetchScores(); // Refresh Leaderboard after saving the score - Assuming this is already implemented
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            pauseButton.classList.toggle('paused', isPaused); // Add or remove the 'paused' class
+
+            if (gameRunning) {
+                if (!isPaused) {
+                    lastTime = performance.now();
+                    requestAnimationFrame(update);
+                }
+            }
+        }
+
+        pauseButton.addEventListener("click", togglePause);
     </script>
 </body>
 </html>

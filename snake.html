@@ -26,7 +26,7 @@
 
         .container {
             text-align: center;
-            position: relative; /* Added for positioning the score */
+            position: relative; /* Added for positioning the score and pause button */
         }
 
         #gameCanvas {
@@ -39,7 +39,7 @@
         .score {
             position: absolute;
             top: 10px;
-            right: -100px;
+            right: -95px;
             background-color: #333;
             padding: 10px; /* Reduced padding */
             border-radius: 5px;
@@ -94,10 +94,37 @@
             border-radius: 5px;
             cursor: pointer;
             margin-top: 10px;
+            margin-left: 5px;  /* Add margin between buttons */
+            margin-right: 5px; /* Add margin between buttons */
         }
 
         .popup-content button:hover {
             background-color: #4cae4c;
+        }
+
+        #pauseButton {
+            position: absolute; /* Positioned absolutely within the container */
+            top: 10px;         /* 10px from the top */
+            left: -60px;        /* 10px from the left */ /* Move to left side */
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 0; /* Remove margin */
+        }
+
+        #pauseButton.paused {
+            background-color: #dc3545; /* Red for paused */
+        }
+
+        #pauseButton:not(.paused) {
+            background-color: #28a745; /* Green for playing */
+        }
+
+
+        #pauseButton:hover {
+            opacity: 0.8; /* Subtle hover effect */
         }
 
 
@@ -108,6 +135,7 @@
         <div class="container">
             <canvas id="gameCanvas" width="400" height="400"></canvas>
             <div class="score">Score: <span id="scoreValue">0</span></div>
+            <button id="pauseButton">II</button>
         </div>
     </div>
 
@@ -120,7 +148,7 @@
         const gridSize = 20;
         const gridWidth = canvas.width / gridSize;
         const gridHeight = canvas.height / gridSize;
-        const gameSpeed = 100; // milliseconds per update
+        let gameSpeed = 100; // milliseconds per update
         const snakeColor = "#28a745";  // Bootstrap success color
         const foodColor = "#f99000";    // Bootstrap danger color
 
@@ -138,12 +166,14 @@
         const inputDelay = 50;
         let nextDirection = { dx: 1, dy: 0 }; // Store the next direction
         let startPopupVisible = true; // Flag to track if the start popup is visible
-
+        let isPaused = false;
 
         // --- UI Elements (Popups) ---
         let popupContainer;
         let nameInput;
         let gameOverPopupContainer; // Store the game over popup
+        const pauseButton = document.getElementById("pauseButton");
+
 
         // --- Utility Functions ---
         const createElement = (tag, attributes = {}, text = null) => {
@@ -316,7 +346,9 @@
         }
 
         function update(timestamp) {
-            if (!gameRunning) return;
+            if (!gameRunning) return; // Stop update if the game is not running.
+
+            if (isPaused) return; //stop update when paused
 
             if (!lastUpdate) lastUpdate = timestamp;
             const deltaTime = timestamp - lastUpdate;
@@ -421,9 +453,13 @@
             const startButton = createElement('button', {}, "ลุยโลด");
             startButton.addEventListener("click", startGame);
 
+            const guestButton = createElement('button', {}, "เล่นแบบ Guest");
+            guestButton.addEventListener("click", startGameAsGuest);
+
             popupContent.appendChild(gameDescription);
             popupContent.appendChild(nameInput);
             popupContent.appendChild(startButton);
+            popupContent.appendChild(guestButton); // Add Guest button
             popupContainer.appendChild(popupContent);
             document.body.appendChild(popupContainer);
         }
@@ -470,14 +506,16 @@
             quitButton.addEventListener("click", () => {
                 document.body.removeChild(gameOverPopupContainer);
                 resetGame();
-                popupContainer.style.display = "flex";
+                showStartPopup();
             });
             gameOverPopupContent.appendChild(quitButton);
 
             gameOverPopupContainer.appendChild(gameOverPopupContent);
             document.body.appendChild(gameOverPopupContainer);
 
-            saveScore(playerName, score);
+            if (playerName) {
+                saveScore(playerName, score);
+            }
         }
 
         function showStartPopup() {
@@ -503,6 +541,15 @@
             }
         }
 
+        function startGameAsGuest() {
+            playerName = ""; // Set player name to empty string for guest
+            gameRunning = true;
+            resetGame();
+            popupContainer.style.display = "none";
+            lastUpdate = 0;
+            requestAnimationFrame(update);
+        }
+
         // --- Leaderboard Functions ---
         function saveScore(name, score) {
             const scriptURL = 'https://script.google.com/macros/s/AKfycbztSJm2-P3B_lbKF2pOwK_0K9LUzEtx1M7AQ0U7RDinWb6QPT1r0tC8vee-_65tjT1O/exec';
@@ -516,10 +563,24 @@
             })
                 .then(response => {
                     console.log('Success:', response);
-                    fetchScores();
+                    //fetchScores();
                 })
                 .catch(error => console.error('Error:', error));
         }
+
+         // --- Pause Functionality ---
+         function togglePause() {
+            isPaused = !isPaused;
+            pauseButton.classList.toggle('paused', isPaused); // Toggle the 'paused' class
+            if (gameRunning) {
+                requestAnimationFrame(update); // Resume game loop if running
+            }
+        }
+
+
+        pauseButton.addEventListener("click", togglePause);
+
+
 
         createStartPopup();
     </script>
