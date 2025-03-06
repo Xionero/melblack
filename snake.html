@@ -103,29 +103,30 @@
         }
 
         #pauseButton {
-            position: absolute; /* Positioned absolutely within the container */
-            top: 10px;         /* 10px from the top */
-            left: -60px;        /* 10px from the left */ /* Move to left side */
-            padding: 10px 20px;
+            position: absolute;
+            top: 5px; /* Adjust as needed */
+            left: -40px; /* Adjust as needed */
+            padding: 5px 10px;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-top: 0; /* Remove margin */
+            font-size: 1.5em; /* Make the symbol bigger */
+            line-height: 1; /* Vertically center the symbol */
+        }
+
+        #pauseButton:hover {
+          opacity: 0.8;
         }
 
         #pauseButton.paused {
-            background-color: #dc3545; /* Red for paused */
+            background-color: rgba(220, 53, 69, 0.7); /* Semi-transparent red */
         }
 
         #pauseButton:not(.paused) {
-            background-color: #28a745; /* Green for playing */
+            background-color: rgba(25, 135, 84, 0.7); /* Semi-transparent green */
         }
 
-
-        #pauseButton:hover {
-            opacity: 0.8; /* Subtle hover effect */
-        }
 
 
     </style>
