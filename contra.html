@@ -4,14 +4,25 @@
   <title>NES Emulator</title>
   <style>
     #gameCanvas {
-      image-rendering: pixelated; /* ทำให้ภาพคมชัด */
+      image-rendering: pixelated;
     }
   </style>
   <script type="text/javascript" src="https://cdn.rawgit.com/takahirox/nes-js/v0.0.1/build/nes.min.js"></script>
   <script type="text/javascript">
+    var nes; // Declare nes outside of init() to make it accessible globally
+    var keyMap = {
+      38: 0, // Up
+      40: 1, // Down
+      37: 2, // Left
+      39: 3, // Right
+      65: 4, // A (z)
+      83: 5, // B (x)
+      13: 7, // Start (Enter)
+      32: 6  // Select (Space)
+    };
+
     function init() {
-      // **เปลี่ยนตรงนี้เป็น URL ของไฟล์ ROM ของคุณ**
-      var url = 'Contra.nes'; // ตัวอย่าง: ไฟล์อยู่ในโฟลเดอร์เดียวกับ HTML
+      var url = 'super_mario_bros.nes';
 
       var request = new XMLHttpRequest();
       request.responseType = 'arraybuffer';
@@ -19,14 +30,25 @@
       request.onload = function() {
         if (request.status === 200) {
           var buffer = request.response;
-          var nes = new NesJs.Nes();
+          nes = new NesJs.Nes(); // Assign to the global nes variable
 
           nes.setRom(new NesJs.Rom(buffer));
           nes.setDisplay(new NesJs.Display(document.getElementById('gameCanvas')));
           nes.setAudio(new NesJs.Audio());
 
-          window.onkeydown = function(e) { nes.handleKeyDown(e); };
-          window.onkeyup = function(e) { nes.handleKeyUp(e); };
+          window.onkeydown = function(e) {
+            if (keyMap[e.keyCode] !== undefined) {
+              e.preventDefault(); // Prevent default browser behavior (scrolling, etc.)
+              nes.buttonDown(1, keyMap[e.keyCode]); // Player 1, button ID
+            }
+          };
+
+          window.onkeyup = function(e) {
+            if (keyMap[e.keyCode] !== undefined) {
+              e.preventDefault();
+              nes.buttonUp(1, keyMap[e.keyCode]); // Player 1, button ID
+            }
+          };
 
           nes.bootup();
           nes.run();
