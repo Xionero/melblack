@@ -116,7 +116,7 @@
       }).then(function () {
         console.log("Google Sheets API is ready!");
         //fetchSheetData(); // เอาออกจากการโหลดตอนแรก
-        setInterval(fetchSheetData, 1000); // Set interval to 1 second (1000 milliseconds)
+        setInterval(fetchSheetData, 5000); // Set interval to 1 second (1000 milliseconds)
       }, function(error) {
         console.error("Error initializing API:", error);
         displayError("Failed to load API: " + error.message);
