@@ -24,27 +24,27 @@
             background-color: #333;
             padding: 10px;
             border-radius: 5px;
-            width: 140px; /* Increased width */
+            width: 250px; /* << UPDATED WIDTH */
             text-align: center;
         }
-        .leaderboard h2 { margin-top: 0; color: #fff; font-size: 0.9em; /* Slightly smaller font */ }
+        .leaderboard h2 { margin-top: 0; color: #fff; font-size: 0.9em; }
         .leaderboard ul { list-style: none; padding: 0; }
         .leaderboard li {
             padding: 3px 0;
             border-bottom: 1px solid #555;
-            font-size: 0.75em; /* Slightly smaller font */
+            font-size: 0.75em;
             display: flex;
-            justify-content: space-between; /* Separate name and score */
+            justify-content: space-between;
             align-items: center;
         }
         .leaderboard li:last-child { border-bottom: none; }
         .name {
             text-align: left;
-            flex-grow: 1; /* Allow name to take up available space */
-            overflow: hidden; /* Hide overflowing text */
-            white-space: nowrap; /* Prevent wrapping */
-            text-overflow: ellipsis; /* Add ellipsis (...) if text overflows */
-            max-width: 90px;  /* Increased name width */
+            flex-grow: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            max-width: 160px;  /* << UPDATED MAX-WIDTH */
         }
         .score {
             text-align: right;
@@ -61,16 +61,6 @@
         </div>
 
         <div class="leaderboard">
-            <h2>Snake</h2>
-            <ul id="scoreList2"><li>Loading...</li></ul>
-        </div>
-
-        <div class="leaderboard">
-            <h2>Tetris</h2>
-            <ul id="scoreList3"><li>Loading...</li></ul>
-        </div>
-
-        <div class="leaderboard">
             <h2>Donate</h2>
             <ul id="scoreList4"><li>Loading...</li></ul>
         </div>
@@ -80,14 +70,10 @@
     <script>
         const scriptURLs = [
             'https://script.google.com/macros/s/AKfycbzHvpumKBwI814GeE3oGS1W12LTVmyeiWpIoQ7OyVg8Xl_eYx68p1awxCJBSbVc2NZ3/exec', // puzzle
-            'https://script.google.com/macros/s/AKfycbzvQ2quz6CYHaHpPCaximxmPVOgxxllp9WhHswHDd_JSWaMbuMiAlcaBOjsroaLmSq6/exec', // งูกินแมว
-            'https://script.google.com/macros/s/AKfycbwr88rqcMACr_50qzEP8KJ7rUOpBQdD4byGjEoBgCUSy5YB4iErSNw3O6JDpVTF8bAq/exec', // Tetris
             'https://script.google.com/macros/s/AKfycbzcTfRFkcwRJQe1FblbLfwnSGOVTsw8d3S9enYT-bF0HOkGQegfYkLq99eKvArWQF4w/exec'  // Donate
         ];
         const scoreLists = [
             document.getElementById("scoreList1"),
-            document.getElementById("scoreList2"),
-            document.getElementById("scoreList3"),
             document.getElementById("scoreList4")
         ];
 
@@ -102,8 +88,8 @@
                         const nameSpan = document.createElement('span');
                         nameSpan.classList.add('name');
 
-                        // Truncate name if it's longer than 12 characters
-                        nameSpan.textContent = score.name.length > 12 ? score.name.substring(0, 12) + '...' : score.name;
+                        // Truncate name if it's longer than 18 characters << UPDATED
+                        nameSpan.textContent = score.name.length > 18 ? score.name.substring(0, 18) + '...' : score.name;
 
                         const scoreSpan = document.createElement('span');
                         scoreSpan.classList.add('score');
