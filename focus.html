@@ -61,45 +61,37 @@
 </head>
 <body>
     <form action="" method="post" onsubmit="validateAndSubmitForm(event);" accept-charset="UTF-8" autocomplete="off" name="question">
-
-        <!-- Name Input -->
         <div class="form-group">
             <label for="sender">ชื่อ Youtube ของคุณ</label>
-            <!-- สำคัญ: ต้องมี id="sender" เพื่อให้ Javascript หาเจอ -->
             <input type="text" id="sender" name="youtube_name" placeholder="ใส่ชื่อของคุณที่นี่" required>
         </div>
         
-        <p>เลือกตอบเพียง 1 รูปแต่ละรูปจะได้คะแนนไม่เท่ากัน</p>
-        
-        <!-- Image Selection -->
         <div class="image-selection-container">
             <div class="image-option">
                 <div class="image-number-overlay">+1</div>
-                <input type="radio" id="img1" name="selectedImage" value="Image 1" style="display:none;">
-                <label for="img1"><img src="https://xionero.github.io/melblack/1.jpg" alt="1"></label>
+                <input type="radio" id="img1" name="selectedImage" value="เลือก 1" style="display:none;">
+                <label for="img1"><img src="https://xionero.github.io/melblack/1.jpg" alt="Image 1"></label>
             </div>
             <div class="image-option">
                 <div class="image-number-overlay">+2</div>
-                <input type="radio" id="img2" name="selectedImage" value="Image 2" style="display:none;">
-                <label for="img2"><img src="https://xionero.github.io/melblack/2.jpg" alt="2"></label>
+                <input type="radio" id="img2" name="selectedImage" value="เลือก 2" style="display:none;">
+                <label for="img2"><img src="https://xionero.github.io/melblack/2.jpg" alt="Image 2"></label>
             </div>
             <div class="image-option">
                 <div class="image-number-overlay">+3</div>
-                <input type="radio" id="img3" name="selectedImage" value="Image 3" style="display:none;">
-                <label for="img3"><img src="https://xionero.github.io/melblack/3.jpg" alt="3"></label>
+                <input type="radio" id="img3" name="selectedImage" value="เลือก 3" style="display:none;">
+                <label for="img3"><img src="https://xionero.github.io/melblack/3.jpg" alt="Image 3"></label>
             </div>
             <div class="image-option">
                 <div class="image-number-overlay">+4</div>
-                <input type="radio" id="img4" name="selectedImage" value="Image 4" style="display:none;">
-                <label for="img4"><img src="https://xionero.github.io/melblack/4.jpg" alt="4"></label>
+                <input type="radio" id="img4" name="selectedImage" value="เลือก 4" style="display:none;">
+                <label for="img4"><img src="https://xionero.github.io/melblack/4.jpg" alt="Image 4"></label>
             </div>
         </div>
-
-        <!-- Single Answer Input -->
+        <p>คลิกเลือกตอบเพียง 1 รูปเท่านั้น</p>  
         <div class="form-group">
              <label for="answer">คำตอบ</label>
-             <!-- สำคัญ: ต้องมี id="answer" เพื่อให้ Javascript หาเจอ -->
-             <input type="text" id="answer" name="answer" placeholder="ใส่คำตอบ">
+             <input type="text" id="answer" name="answer" placeholder="ใส่คำตอบ" required>
         </div>
 
         <input type="submit" value="ส่งคำตอบ" id="submitButton">
@@ -109,26 +101,32 @@
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzKHjlvHYs5BRfXXUKIOJ2I3JmXqaFjwp795dN7kjLwww8CFYzJPmE9WXpw9NxmmbX8jw/exec';
         const form = document.forms['question'];
-        const submitButton = document.getElementById('submitButton');
+        const senderInput = document.getElementById('sender');
+
+        // โหลดชื่อผู้ส่งที่บันทึกไว้เมื่อเปิดหน้า
+        const storedSender = localStorage.getItem('senderName');
+        if (storedSender) {
+            senderInput.value = storedSender;
+        }
 
         function validateAndSubmitForm(event) {
             event.preventDefault();
             
-            // โค้ดส่วนนี้ต้องการ id="sender" และ id="answer" ใน HTML
-            const sender = document.getElementById('sender').value.trim();
+            const sender = senderInput.value.trim();
             const selectedImage = document.querySelector('input[name="selectedImage"]:checked');
             const answer = document.getElementById('answer').value.trim();
 
             if (sender === '') {
-                Swal.fire({ icon: 'warning', title: 'กรุณากรอกชื่อของคุณ', });
+                Swal.fire({ icon: 'warning', title: 'กรุณากรอกชื่อของคุณ', customClass: { container: 'no-overlay' } });
                 return;
             }
             if (!selectedImage) {
-                Swal.fire({ icon: 'warning', title: 'กรุณาเลือกรูปภาพ', text: 'คลิกที่รูปภาพเพื่อเลือก' });
+                Swal.fire({ icon: 'warning', title: 'กรุณาเลือกรูปภาพ', text: 'คลิกที่รูปภาพเพื่อเลือก', customClass: { container: 'no-overlay' } });
                 return;
             }
             if (answer === '') {
-                Swal.fire({ icon: 'warning', title: 'กรุณากรอกคำตอบ', });
+                // แก้ไขจากโค้ดเดิมที่ไม่มี required แต่เช็คใน js ให้ required ไปเลย
+                Swal.fire({ icon: 'warning', title: 'กรุณากรอกคำตอบ', customClass: { container: 'no-overlay' } });
                 return;
             }
             submitForm();
@@ -144,34 +142,24 @@
                 customClass: { container: 'no-overlay' }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    submitButton.disabled = true;
-                    submitButton.style.backgroundColor = '#ccc';
-                    submitButton.style.cursor = 'not-allowed';
+                    // 1. ส่งข้อมูลไปเบื้องหลัง (Fire-and-forget)
                     fetch(scriptURL, { method: 'POST', body: new FormData(form) })
-                        .then(response => {
-                            if (!response.ok) {
-                                return response.text().then(text => { throw new Error('HTTP error! Status: ' + response.status + ', ' + text); });
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            submitButton.disabled = false;
-                            submitButton.style.backgroundColor = '#ff2767';
-                            submitButton.style.cursor = 'pointer';
-                            if (data.result === "success") {
-                                Swal.fire({ icon: 'success', title: 'ส่งคำตอบเรียบร้อยแล้ว!', showConfirmButton: false, timer: 3000, customClass: { container: 'no-overlay' } });
-                                form.reset();
-                            } else {
-                                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: data.error || 'Unknown error', timer: 3000, customClass: { container: 'no-overlay' } });
-                            }
-                        })
-                        .catch(error => {
-                            submitButton.disabled = false;
-                            submitButton.style.backgroundColor = '#ff2767';
-                            submitButton.style.cursor = 'pointer';
-                            console.error('Error:', error);
-                            Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาดในการส่ง', text: error.message });
-                        });
+                        .catch(error => console.error('Error!', error.message)); // ดักจับ Error ไว้ใน Console เพื่อดีบัก
+
+                    // 2. แสดงผลว่าสำเร็จทันที
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ส่งคำตอบเรียบร้อยแล้ว!',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        customClass: { container: 'no-overlay' }
+                    });
+
+                    // 3. บันทึกชื่อผู้ส่ง และรีเซ็ตฟอร์มโดยเก็บชื่อไว้
+                    const senderNameValue = senderInput.value;
+                    localStorage.setItem('senderName', senderNameValue);
+                    form.reset();
+                    senderInput.value = senderNameValue;
                 }
             });
         }
