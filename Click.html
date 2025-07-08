@@ -8,7 +8,8 @@
         /* CSS ทั้งหมดเหมือนเดิม ไม่มีการเปลี่ยนแปลง */
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&display=swap');
         body { font-family: 'Kanit', sans-serif; background-color: transparent; color: #4a2c0c; display: flex; justify-content: center; align-items: flex-start; padding-top: 40px; box-sizing: border-box; min-height: 100vh; margin: 0; user-select: none; }
-        .game-container { width: 800px; max-width: 95%; background-color: #c8b68e; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); padding: 20px; display: flex; gap: 20px; }
+        /* เพิ่ม position: relative; ให้กับ game-container เพื่อเป็นกรอบให้ตัวเลขลอย */
+        .game-container { position: relative; width: 800px; max-width: 95%; background-color: #c8b68e; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); padding: 20px; display: flex; gap: 20px; }
         .left-panel, .right-panel { flex: 1; display: flex; flex-direction: column; gap: 15px; }
         .save-load-container { background-color: #e6d8b8; padding: 15px; border-radius: 10px; border: 2px solid #a8936a; display: flex; flex-direction: column; gap: 10px; }
         .save-load-container input { padding: 8px; border-radius: 5px; border: 1px solid #a8936a; font-family: 'Kanit', sans-serif; font-size: 1em; text-align: center; }
@@ -55,7 +56,7 @@
         
         let gameData = getInitialGameData();
         
-        // --- DOM Elements (เหมือนเดิม) ---
+        // --- DOM Elements ---
         const goldDisplay = document.getElementById('gold-display');
         const gpsDisplay = document.getElementById('gps-display');
         const gpcDisplay = document.getElementById('gpc-display');
@@ -64,100 +65,241 @@
         const saveButton = document.getElementById('save-button');
         const loadButton = document.getElementById('load-button');
 
-        // --- NEW: ปรับปรุงฟังก์ชัน saveGame ให้ง่ายขึ้น ---
+        // --- ฟังก์ชัน Save/Load ---
         async function saveGame() {
             const saveId = saveIdInput.value.trim();
-            if (!saveId) {
-                alert('กรุณาใส่ชื่อก่อนครับ!');
-                return;
-            }
-            saveButton.innerText = 'กำลังบันทึก...';
-            saveButton.disabled = true;
+            if (!saveId) { alert('กรุณาใส่ชื่อก่อนครับ!'); return; }
+            saveButton.innerText = 'กำลังบันทึก...'; saveButton.disabled = true;
             try {
                 const dataToSave = { ...gameData };
-                delete dataToSave.gold; // ลบ gold ออกจาก object ที่จะแปลงเป็น JSON
-
-                const payload = {
-                    saveId: saveId,
-                    gold: gameData.gold,
-                    gameDataJson: JSON.stringify(dataToSave)
-                };
-
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                delete dataToSave.gold;
+                const payload = { saveId: saveId, gold: gameData.gold, gameDataJson: JSON.stringify(dataToSave) };
+                await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 alert(`เกมของคุณถูกบันทึกด้วยชื่อ: ${saveId}`);
-            } catch (error) {
-                console.error('Error saving game:', error);
-                alert('เกิดข้อผิดพลาดในการบันทึกเกม!');
-            } finally {
-                saveButton.innerText = 'บันทึกเกม';
-                saveButton.disabled = false;
-            }
+            } catch (error) { console.error('Error saving game:', error); alert('เกิดข้อผิดพลาดในการบันทึกเกม!'); }
+            finally { saveButton.innerText = 'บันทึกเกม'; saveButton.disabled = false; }
         }
-
-        // --- NEW: ปรับปรุงฟังก์ชัน loadGame ให้ง่ายขึ้น ---
         async function loadGame() {
             const saveId = saveIdInput.value.trim();
-            if (!saveId) {
-                alert('กรุณาใส่ชื่อที่ต้องการโหลด!');
-                return;
-            }
-            loadButton.innerText = 'กำลังโหลด...';
-            loadButton.disabled = true;
+            if (!saveId) { alert('กรุณาใส่ชื่อที่ต้องการโหลด!'); return; }
+            loadButton.innerText = 'กำลังโหลด...'; loadButton.disabled = true;
             try {
                 const response = await fetch(`${SCRIPT_URL}?saveId=${saveId}`);
                 const result = await response.json();
-                
                 if (result.status === "success") {
-                    // result.data จะเป็น object ที่มี gold และ gameDataJson
                     const otherData = JSON.parse(result.data.gameDataJson);
-
-                    // ประกอบร่าง gameData ขึ้นมาใหม่
-                    const loadedGameData = {
-                        gold: parseFloat(result.data.gold),
-                        ...otherData
-                    };
+                    let loadedGameData = { gold: parseFloat(result.data.gold), ...otherData };
                     
-                    // (Optional) ตรวจสอบความเข้ากันได้กับเซฟเก่า
-                    if (!loadedGameData.clickUpgrade) {
-                        loadedGameData.clickUpgrade = getInitialGameData().clickUpgrade;
+                    // ตรวจสอบและอัปเดตเซฟเก่าให้มีโครงสร้าง clickPower ใหม่
+                    if (!loadedGameData.clickPower || loadedGameData.clickPower.baseGpc === undefined) {
+                         loadedGameData.clickPower = getInitialGameData().clickPower;
                     }
-
+                    
                     gameData = loadedGameData;
                     alert(`โหลดข้อมูลสำหรับชื่อ "${saveId}" สำเร็จ!`);
-                    
                     initializeStore();
                     updateDisplay();
                 } else if (result.status === "not_found") {
                     alert(`ไม่พบข้อมูลเซฟสำหรับชื่อ "${saveId}"`);
-                } else {
-                    throw new Error(result.message);
+                } else { throw new Error(result.message); }
+            } catch (error) { console.error('Error loading game:', error); alert('เกิดข้อผิดพลาดในการโหลดเกม!'); }
+            finally { loadButton.innerText = 'โหลดเกม'; loadButton.disabled = false; }
+        }
+
+        // --- โครงสร้างข้อมูลเกมที่ปรับสมดุลแล้ว ---
+        function getInitialGameData() {
+            return {
+                gold: 0,
+                clickPower: {
+                    name: 'พลั่วขุดทอง',
+                    count: 1,
+                    level: 1,
+                    baseGpc: 1,
+                    buyCost: 20,
+                    upgradeCost: 500
+                },
+                items: {
+                    miner: { name: 'คนงานเหมือง', count: 0, level: 1, baseCost: 15, currentCost: 15, baseGps: 0.2, upgradeCost: 150 },
+                    minecart: { name: 'รถเข็นขนแร่', count: 0, level: 1, baseCost: 120, currentCost: 120, baseGps: 1.5, upgradeCost: 1200 },
+                    smelter: { name: 'โรงหลอม', count: 0, level: 1, baseCost: 1300, currentCost: 1300, baseGps: 10, upgradeCost: 15000 },
+                    excavator: { name: 'รถขุดเจาะ', count: 0, level: 1, baseCost: 15000, currentCost: 15000, baseGps: 60, upgradeCost: 220000 }
                 }
-            } catch (error) {
-                console.error('Error loading game:', error);
-                alert('เกิดข้อผิดพลาดในการโหลดเกม!');
-            } finally {
-                loadButton.innerText = 'โหลดเกม';
-                loadButton.disabled = false;
+            };
+        }
+
+        // --- ฟังก์ชันซื้อ/อัปเกรด ที่ปรับสูตรราคา ---
+        function buyClickPower() {
+            const cp = gameData.clickPower;
+            if (gameData.gold >= cp.buyCost) {
+                gameData.gold -= cp.buyCost;
+                cp.count++;
+                cp.buyCost = Math.ceil(20 * Math.pow(1.18, cp.count - 1));
+                updateDisplay();
             }
         }
-        
-        // --- ฟังก์ชันอื่นๆ ทั้งหมดเหมือนเดิม ไม่มีการเปลี่ยนแปลง ---
-        function getInitialGameData() { return { gold: 0, goldPerClick: 1, clickUpgrade: { name: 'ถุงมือทองคำ', level: 1, maxLevel: 10, baseCost: 50, currentCost: 50 }, items: { miner: { name: 'คนงานเหมือง', count: 0, level: 1, baseCost: 15, currentCost: 15, baseGps: 0.1, upgradeCost: 100 }, minecart: { name: 'รถเข็นขนแร่', count: 0, level: 1, baseCost: 100, currentCost: 100, baseGps: 1, upgradeCost: 1000 }, smelter: { name: 'โรงหลอม', count: 0, level: 1, baseCost: 1200, currentCost: 1200, baseGps: 8, upgradeCost: 15000 }, excavator: { name: 'รถขุดเจาะ', count: 0, level: 1, baseCost: 15000, currentCost: 15000, baseGps: 50, upgradeCost: 200000 } } }; }
-        function mineGold() { gameData.gold += gameData.goldPerClick; updateDisplay(); }
-        function buyClickUpgrade() { const upgrade = gameData.clickUpgrade; if (upgrade.level < upgrade.maxLevel && gameData.gold >= upgrade.currentCost) { gameData.gold -= upgrade.currentCost; upgrade.level++; gameData.goldPerClick = upgrade.level; upgrade.currentCost = Math.ceil(upgrade.baseCost * Math.pow(2.5, upgrade.level - 1)); updateDisplay(); } }
-        function buyItem(itemId) { const item = gameData.items[itemId]; if (gameData.gold >= item.currentCost) { gameData.gold -= item.currentCost; item.count++; item.currentCost = Math.ceil(item.baseCost * Math.pow(1.15, item.count)); updateDisplay(); } }
-        function upgradeItem(itemId) { const item = gameData.items[itemId]; if (gameData.gold >= item.upgradeCost) { gameData.gold -= item.upgradeCost; item.level++; item.upgradeCost = Math.ceil(item.upgradeCost * 3.5); updateDisplay(); } }
-        function calculateTotalGps() { let totalGps = 0; if (!gameData.items) return 0; for (const itemId in gameData.items) { const item = gameData.items[itemId]; const itemGps = item.count * item.baseGps * Math.pow(2, item.level - 1); totalGps += itemGps; } return totalGps; }
-        function updateDisplay() { const totalGps = calculateTotalGps(); goldDisplay.innerText = Math.floor(gameData.gold).toLocaleString(); gpsDisplay.innerText = totalGps.toFixed(1).toLocaleString(); gpcDisplay.innerText = gameData.goldPerClick.toLocaleString(); const upgrade = gameData.clickUpgrade; const upgradeBtn = document.getElementById('click-upgrade-btn'); const upgradeLevelText = document.getElementById('click-upgrade-level'); if(upgradeBtn && upgradeLevelText) { upgradeLevelText.innerText = `Lv. ${upgrade.level}`; if (upgrade.level >= upgrade.maxLevel) { upgradeBtn.innerText = 'สูงสุดแล้ว'; upgradeBtn.disabled = true; } else { upgradeBtn.innerText = `อัปเกรด (${upgrade.currentCost.toLocaleString()})`; upgradeBtn.disabled = gameData.gold < upgrade.currentCost; } } for (const itemId in gameData.items) { const item = gameData.items[itemId]; const itemDiv = document.getElementById(`item-${itemId}`); if (itemDiv) { const itemGps = item.count * item.baseGps * Math.pow(2, item.level - 1); itemDiv.querySelector('.item-level').innerText = `Lv. ${item.level}`; itemDiv.querySelector('.item-count').innerText = `จำนวน: ${item.count}`; itemDiv.querySelector('.item-gps').innerText = `GPS: ${itemGps.toFixed(1)}`; const buyBtn = itemDiv.querySelector('.buy-btn'); buyBtn.innerText = `ซื้อ (${item.currentCost.toLocaleString()})`; buyBtn.disabled = gameData.gold < item.currentCost; const upgradeBtn = itemDiv.querySelector('.upgrade-btn'); upgradeBtn.innerText = `อัปเกรด (${item.upgradeCost.toLocaleString()})`; upgradeBtn.disabled = gameData.gold < item.upgradeCost; } } }
-        function initializeStore() { const clickUpgradeContainer = document.getElementById('click-upgrade-container'); clickUpgradeContainer.innerHTML = ''; const upgrade = gameData.clickUpgrade; const upgradeDiv = document.createElement('div'); upgradeDiv.className = 'click-upgrade-item'; upgradeDiv.innerHTML = `<div class="item-info"><span>${upgrade.name} <span id="click-upgrade-level">Lv. ${upgrade.level}</span></span></div><div class="item-stats"><span>เพิ่มพลังการคลิก +1 ต่อเลเวล</span></div><div class="item-actions"><button id="click-upgrade-btn" onclick="buyClickUpgrade()"></button></div>`; clickUpgradeContainer.appendChild(upgradeDiv); const itemListDiv = document.getElementById('item-list'); itemListDiv.innerHTML = ''; for (const itemId in gameData.items) { const item = gameData.items[itemId]; const itemDiv = document.createElement('div'); itemDiv.className = 'item'; itemDiv.id = `item-${itemId}`; itemDiv.innerHTML = `<div class="item-info"><span>${item.name} <span class="item-level">Lv. ${item.level}</span></span><span class="item-count">จำนวน: ${item.count}</span></div><div class="item-stats"><span class="item-gps">GPS: 0.0</span></div><div class="item-actions"><button class="buy-btn" onclick="buyItem('${itemId}')">ซื้อ</button><button class="upgrade-btn" onclick="upgradeItem('${itemId}')">อัปเกรด</button></div>`; itemListDiv.appendChild(itemDiv); } }
-        function gameLoop() { const totalGps = calculateTotalGps(); gameData.gold += totalGps; updateDisplay(); }
-        clickButton.addEventListener('click', mineGold); saveButton.addEventListener('click', saveGame); loadButton.addEventListener('click', loadGame);
-        initializeStore(); setInterval(gameLoop, 1000); updateDisplay();
+
+        function upgradeClickPower() {
+            const cp = gameData.clickPower;
+            if (gameData.gold >= cp.upgradeCost) {
+                gameData.gold -= cp.upgradeCost;
+                cp.level++;
+                cp.upgradeCost = Math.ceil(cp.upgradeCost * 4);
+                updateDisplay();
+            }
+        }
+
+        function buyItem(itemId) {
+            const item = gameData.items[itemId];
+            if (gameData.gold >= item.currentCost) {
+                gameData.gold -= item.currentCost;
+                item.count++;
+                item.currentCost = Math.ceil(item.baseCost * Math.pow(1.15, item.count));
+                updateDisplay();
+            }
+        }
+
+        function upgradeItem(itemId) {
+            const item = gameData.items[itemId];
+            if (gameData.gold >= item.upgradeCost && item.count > 0) {
+                gameData.gold -= item.upgradeCost;
+                item.level++;
+                item.upgradeCost = Math.ceil(item.upgradeCost * 4);
+                updateDisplay();
+            }
+        }
+
+        // --- ฟังก์ชันคำนวณและแสดงผล ---
+        function calculateTotalGpc() {
+            const cp = gameData.clickPower;
+            return cp.baseGpc * cp.count * Math.pow(2, cp.level - 1);
+        }
+
+        function mineGold() {
+            const gpc = calculateTotalGpc();
+            gameData.gold += gpc;
+            createFloatingNumber(gpc, clickButton);
+            updateDisplay();
+        }
+
+        function calculateTotalGps() {
+            let totalGps = 0;
+            if (!gameData.items) return 0;
+            for (const itemId in gameData.items) {
+                const item = gameData.items[itemId];
+                const itemGps = item.count * item.baseGps * Math.pow(2, item.level - 1);
+                totalGps += itemGps;
+            }
+            return totalGps;
+        }
+
+        function updateDisplay() {
+            const totalGps = calculateTotalGps();
+            const totalGpc = calculateTotalGpc();
+            goldDisplay.innerText = Math.floor(gameData.gold).toLocaleString();
+            gpsDisplay.innerText = totalGps.toFixed(1).toLocaleString();
+            gpcDisplay.innerText = totalGpc.toLocaleString();
+
+            const cp = gameData.clickPower;
+            const cpDiv = document.getElementById('click-upgrade-container');
+            if (cpDiv) {
+                cpDiv.querySelector('.item-level').innerText = `Lv. ${cp.level}`;
+                cpDiv.querySelector('.item-count').innerText = `จำนวน: ${cp.count}`;
+                cpDiv.querySelector('.item-gpc').innerText = `GPC: ${totalGpc.toLocaleString()}`;
+                const buyBtn = cpDiv.querySelector('.buy-click-btn');
+                const gpcPerBuy = cp.baseGpc * Math.pow(2, cp.level - 1);
+                buyBtn.innerText = `ซื้อ (+${gpcPerBuy.toLocaleString()}) (${cp.buyCost.toLocaleString()})`;
+                buyBtn.disabled = gameData.gold < cp.buyCost;
+                const upgradeBtn = cpDiv.querySelector('.upgrade-click-btn');
+                upgradeBtn.innerText = `อัปเกรด (x2) (${cp.upgradeCost.toLocaleString()})`;
+                upgradeBtn.disabled = gameData.gold < cp.upgradeCost;
+            }
+
+            for (const itemId in gameData.items) {
+                const item = gameData.items[itemId];
+                const itemDiv = document.getElementById(`item-${itemId}`);
+                if (itemDiv) {
+                    const itemGps = item.count * item.baseGps * Math.pow(2, item.level - 1);
+                    itemDiv.querySelector('.item-level').innerText = `Lv. ${item.level}`;
+                    itemDiv.querySelector('.item-count').innerText = `จำนวน: ${item.count}`;
+                    itemDiv.querySelector('.item-gps').innerText = `GPS: ${itemGps.toFixed(1)}`;
+                    const buyBtn = itemDiv.querySelector('.buy-btn');
+                    buyBtn.innerText = `ซื้อ (${item.currentCost.toLocaleString()})`;
+                    buyBtn.disabled = gameData.gold < item.currentCost;
+                    const upgradeBtn = itemDiv.querySelector('.upgrade-btn');
+                    upgradeBtn.innerText = `อัปเกรด (${item.upgradeCost.toLocaleString()})`;
+                    upgradeBtn.disabled = gameData.gold < item.upgradeCost || item.count === 0;
+                }
+            }
+        }
+
+        function initializeStore() {
+            const clickUpgradeContainer = document.getElementById('click-upgrade-container');
+            clickUpgradeContainer.innerHTML = '';
+            const cp = gameData.clickPower;
+            const clickDiv = document.createElement('div');
+            clickDiv.className = 'click-upgrade-item';
+            clickDiv.innerHTML = `<div class="item-info"><span>${cp.name} <span class="item-level"></span></span><span class="item-count"></span></div><div class="item-stats"><span class="item-gpc"></span></div><div class="item-actions"><button class="buy-click-btn" onclick="buyClickPower()">ซื้อ</button><button class="upgrade-click-btn" onclick="upgradeClickPower()">อัปเกรด</button></div>`;
+            clickUpgradeContainer.appendChild(clickDiv);
+
+            const itemListDiv = document.getElementById('item-list');
+            itemListDiv.innerHTML = '';
+            for (const itemId in gameData.items) {
+                const item = gameData.items[itemId];
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'item';
+                itemDiv.id = `item-${itemId}`;
+                itemDiv.innerHTML = `<div class="item-info"><span>${item.name} <span class="item-level"></span></span><span class="item-count"></span></div><div class="item-stats"><span class="item-gps"></span></div><div class="item-actions"><button class="buy-btn" onclick="buyItem('${itemId}')">ซื้อ</button><button class="upgrade-btn" onclick="upgradeItem('${itemId}')">อัปเกรด</button></div>`;
+                itemListDiv.appendChild(itemDiv);
+            }
+        }
+
+        // ฟังก์ชันสำหรับสร้างเอฟเฟกต์ตัวเลขลอย
+        function createFloatingNumber(text, element) {
+            const number = document.createElement('div');
+            number.textContent = `+${Math.floor(text)}`;
+            number.style.position = 'absolute';
+            number.style.fontSize = '1.5em';
+            number.style.fontWeight = 'bold';
+            number.style.color = '#ffd700';
+            number.style.textShadow = '1px 1px 2px #4a2c0c';
+            number.style.pointerEvents = 'none';
+            number.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
+            
+            const rect = element.getBoundingClientRect();
+            const gameContainerRect = document.querySelector('.game-container').getBoundingClientRect();
+            
+            const xOffset = (Math.random() - 0.5) * 80;
+            const yOffset = -50 - (Math.random() * 20);
+
+            number.style.left = `${rect.left - gameContainerRect.left + rect.width / 2 + xOffset}px`;
+            number.style.top = `${rect.top - gameContainerRect.top + rect.height / 2 + yOffset}px`;
+
+            document.querySelector('.game-container').appendChild(number);
+
+            requestAnimationFrame(() => {
+                number.style.transform = 'translateY(-80px)';
+                number.style.opacity = '0';
+            });
+
+            setTimeout(() => {
+                number.remove();
+            }, 1000);
+        }
+
+        function gameLoop() {
+            const totalGps = calculateTotalGps();
+            gameData.gold += totalGps;
+            updateDisplay();
+        }
+
+        // --- Event Listeners and Initializer ---
+        clickButton.addEventListener('click', mineGold);
+        saveButton.addEventListener('click', saveGame);
+        loadButton.addEventListener('click', loadGame);
+
+        initializeStore();
+        setInterval(gameLoop, 1000);
+        updateDisplay();
     </script>
 </body>
 </html>
