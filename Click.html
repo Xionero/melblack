@@ -7,16 +7,22 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&display=swap');
         
-        body { font-family: 'Kanit', sans-serif; background-color: #5a4e3a; color: #4a2c0c; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; user-select: none; }
+        body { font-family: 'Kanit', sans-serif; background-color: transparent; color: #4a2c0c; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; user-select: none; }
         
-        /* --- สไตล์หน้าจอเริ่มต้น (เหมือนเดิม) --- */
-        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        #start-modal { background-color: #c8b68e; padding: 30px 40px; border-radius: 15px; text-align: center; border: 3px solid #a8936a; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-        #start-modal h2 { margin-top: 0; font-size: 1.8em; color: #4a2c0c; }
+        /* --- สไตล์หน้าจอ Popup ทั่วไป --- */
+        .popup-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .popup-modal { background-color: #c8b68e; padding: 30px 40px; border-radius: 15px; text-align: center; border: 3px solid #a8936a; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .popup-modal h2 { margin-top: 0; font-size: 1.8em; color: #4a2c0c; }
+        .popup-modal p { font-size: 1.2em; margin-bottom: 25px; line-height: 1.6; }
         #player-name-input { padding: 12px; width: 250px; border-radius: 5px; border: 2px solid #a8936a; font-family: 'Kanit', sans-serif; font-size: 1.2em; text-align: center; margin-bottom: 20px; }
-        #start-game-button { padding: 10px 30px; font-family: 'Kanit', sans-serif; font-size: 1.2em; border-radius: 8px; border: 2px solid #8c6f3e; cursor: pointer; background-color: #a8e6cf; transition: background-color 0.2s, transform 0.1s; }
-        #start-game-button:hover { background-color: #81c7a8; }
-        #start-game-button:active { transform: scale(0.98); }
+        .popup-button { padding: 10px 30px; font-family: 'Kanit', sans-serif; font-size: 1.2em; border-radius: 8px; border: 2px solid #8c6f3e; cursor: pointer; background-color: #a8e6cf; transition: background-color 0.2s, transform 0.1s; }
+        .popup-button:hover:not(:disabled) { background-color: #81c7a8; }
+        .popup-button:active:not(:disabled) { transform: scale(0.98); }
+        .popup-button:disabled { background-color: #b0a38d; cursor: not-allowed; }
+        .cancel-button { background-color: #f7c5c5; }
+        .cancel-button:hover:not(:disabled) { background-color: #e8a7a7; }
+        .popup-actions { display: flex; gap: 15px; justify-content: center; }
+        #new-player-confirm-screen { display: none; }
 
         /* --- สไตล์เกมหลัก --- */
         .game-container { display: none; position: relative; width: 800px; max-width: 95%; background-color: #c8b68e; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); padding: 20px; flex-direction: row; gap: 20px; }
@@ -28,24 +34,10 @@
         #click-button { background: none; border: none; cursor: pointer; padding: 0; transition: transform 0.1s ease-out; }
         #click-button:active { transform: scale(0.95); }
         #click-button img { width: 200px; }
-        
-        /* --- ใหม่: สไตล์สำหรับปุ่มบันทึกเกม --- */
         .save-container { background-color: #e6d8b8; padding: 15px; border-radius: 10px; border: 2px solid #a8936a; display: flex; }
-        #save-button {
-            flex: 1;
-            padding: 10px;
-            font-family: 'Kanit', sans-serif;
-            font-size: 1.1em;
-            border-radius: 5px;
-            border: 2px solid #8c6f3e;
-            cursor: pointer;
-            background-color: #a8e6cf;
-            transition: background-color 0.2s;
-        }
-        #save-button:hover { background-color: #81c7a8; }
+        #save-button { flex: 1; padding: 10px; font-family: 'Kanit', sans-serif; font-size: 1.1em; border-radius: 5px; border: 2px solid #8c6f3e; cursor: pointer; background-color: #a8e6cf; transition: background-color 0.2s, color 0.2s; }
+        #save-button:hover:not(:disabled) { background-color: #81c7a8; }
         #save-button:disabled { background-color: #b0a38d; cursor: not-allowed; color: #7d6b50; border-color: #9c8b70; }
-
-        /* --- สไตล์ร้านค้า (เหมือนเดิม) --- */
         .store-container h2 { text-align: center; margin-top: 0; border-bottom: 2px solid #a8936a; padding-bottom: 8px; margin-bottom: 10px; font-size: 1.3em; }
         .item, .click-upgrade-item { background-color: #e6d8b8; padding: 8px; border-radius: 8px; border: 2px solid #a8936a; display: flex; flex-direction: column; gap: 6px; }
         .click-upgrade-item { background-color: #fffacd; }
@@ -58,38 +50,30 @@
     </style>
 </head>
 <body>
-    <div id="start-screen">
-        <div id="start-modal">
+    <!-- หน้าจอเริ่มต้น -->
+    <div id="start-screen" class="popup-screen">
+        <div class="popup-modal">
             <h2>เหมืองทองคำมหาสนุก</h2>
             <input type="text" id="player-name-input" placeholder="ใส่ชื่อของคุณที่นี่">
-            <button id="start-game-button">เริ่มเกม</button>
+            <button id="start-game-button" class="popup-button">เริ่มเกม</button>
+        </div>
+    </div>
+
+    <!-- Popup สำหรับยืนยันผู้เล่นใหม่ -->
+    <div id="new-player-confirm-screen" class="popup-screen">
+        <div class="popup-modal">
+            <!-- แก้ไข: เพิ่ม ID ให้กับ <p> เพื่อให้ JS ควบคุมได้ -->
+            <p id="new-player-confirm-message"></p>
+            <div class="popup-actions">
+                <button id="confirm-new-game-button" class="popup-button">ตกลง</button>
+                <button id="cancel-new-game-button" class="popup-button cancel-button">ยกเลิก</button>
+            </div>
         </div>
     </div>
 
     <div class="game-container">
-        <div class="left-panel">
-            <div class="stats-container">
-                <h1 id="gold-display">0</h1>
-                <p>ทอง</p>
-                <p>อัตราการผลิต: <span id="gps-display">0</span> ทอง/วินาที</p>
-                <p>พลังคลิก: <span id="gpc-display">1</span></p>
-            </div>
-            <div class="main-action">
-                <button id="click-button"><img src="https://i.pinimg.com/originals/04/4d/12/044d12b83f0f1aa1012563a4701b0531.gif" alt="Gold Pile"></button>
-            </div>
-            <!-- ใหม่: เพิ่มปุ่มบันทึกกลับเข้ามา -->
-            <div class="save-container">
-                <button id="save-button">บันทึกเกม</button>
-            </div>
-        </div>
-        <div class="right-panel">
-            <div class="store-container">
-                <h2>ร้านค้า & อัปเกรด</h2>
-                <div id="click-upgrade-container"></div>
-                <hr style="border-color: #a8936a; border-style: solid; border-width: 1px 0 0 0;">
-                <div id="item-list"></div>
-            </div>
-        </div>
+        <!-- ... โครงสร้างเกมเหมือนเดิม ... -->
+        <div class="left-panel"> <div class="stats-container"> <h1 id="gold-display">0</h1> <p>ทอง</p> <p>อัตราการผลิต: <span id="gps-display">0</span> ทอง/วินาที</p> <p>พลังคลิก: <span id="gpc-display">1</span></p> </div> <div class="main-action"> <button id="click-button"><img src="https://i.pinimg.com/originals/04/4d/12/044d12b83f0f1aa1012563a4701b0531.gif" alt="Gold Pile"></button> </div> <div class="save-container"> <button id="save-button">บันทึกเกม</button> </div> </div> <div class="right-panel"> <div class="store-container"> <h2>ร้านค้า & อัปเกรด</h2> <div id="click-upgrade-container"></div> <hr style="border-color: #a8936a; border-style: solid; border-width: 1px 0 0 0;"> <div id="item-list"></div> </div> </div>
     </div>
 
     <script>
@@ -103,20 +87,49 @@
         const playerNameInput = document.getElementById('player-name-input');
         const startGameButton = document.getElementById('start-game-button');
         const gameContainer = document.querySelector('.game-container');
-        
+        const newPlayerConfirmScreen = document.getElementById('new-player-confirm-screen');
+        // แก้ไข: เพิ่ม Element ของข้อความใน Popup
+        const newPlayerConfirmMessage = document.getElementById('new-player-confirm-message');
+        const confirmNewGameButton = document.getElementById('confirm-new-game-button');
+        const cancelNewGameButton = document.getElementById('cancel-new-game-button');
         const goldDisplay = document.getElementById('gold-display');
         const gpsDisplay = document.getElementById('gps-display');
         const gpcDisplay = document.getElementById('gpc-display');
         const clickButton = document.getElementById('click-button');
-        const saveButton = document.getElementById('save-button'); // เพิ่มปุ่ม Save เข้ามา
+        const saveButton = document.getElementById('save-button');
 
-        // --- แก้ไข: ฟังก์ชันบันทึกเกมแบบ Manual ---
+        // --- ฟังก์ชันหลักของเกม ---
+
+        // แก้ไข: ทำให้ฟังก์ชันรับชื่อผู้เล่นมาแสดงผล
+        function showNewPlayerConfirmPopup(name) {
+            newPlayerConfirmMessage.innerHTML = `ยินดีต้อนรับผู้เล่นใหม่<br>ยืนยันการใช้ชื่อ: <strong>${name}</strong>`;
+            newPlayerConfirmScreen.style.display = 'flex';
+        }
+
+        function hideNewPlayerConfirmPopup() { newPlayerConfirmScreen.style.display = 'none'; startGameButton.disabled = false; startGameButton.innerText = 'เริ่มเกม'; }
+        function startGameFlow() { newPlayerConfirmScreen.style.display = 'none'; startScreen.style.display = 'none'; gameContainer.style.display = 'flex'; initializeStore(); updateDisplay(); setInterval(gameLoop, 1000); }
+
+        async function initializeGame() {
+            playerName = playerNameInput.value.trim();
+            if (!playerName) { alert('กรุณาใส่ชื่อของคุณก่อนเริ่มเกม!'); return; }
+            
+            startGameButton.innerText = 'กำลังตรวจสอบ...';
+            startGameButton.disabled = true;
+
+            const loadedData = await loadGameData(playerName);
+            if (loadedData) {
+                gameData = loadedData;
+                startGameFlow();
+            } else {
+                // แก้ไข: ส่งชื่อผู้เล่นไปให้ฟังก์ชันแสดง Popup
+                showNewPlayerConfirmPopup(playerName);
+            }
+        }
+
         async function saveGame() {
-            if (!playerName) return;
-
+            if (!playerName || saveButton.disabled) return;
             saveButton.innerText = 'กำลังบันทึก...';
             saveButton.disabled = true;
-
             try {
                 const dataToSave = { ...gameData };
                 delete dataToSave.gold;
@@ -125,68 +138,26 @@
                     gold: Math.floor(gameData.gold),
                     gameDataJson: JSON.stringify(dataToSave)
                 };
-
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
+                    mode: 'no-cors', 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
-                alert(`เกมของคุณถูกบันทึกด้วยชื่อ: ${playerName}`);
+                saveButton.innerText = 'บันทึกเรียบร้อย!';
             } catch (error) {
                 console.error('Error saving game:', error);
-                alert('เกิดข้อผิดพลาดในการบันทึกเกม!');
+                saveButton.innerText = 'บันทึกไม่สำเร็จ!';
             } finally {
-                saveButton.innerText = 'บันทึกเกม';
-                saveButton.disabled = false;
+                setTimeout(() => {
+                    saveButton.innerText = 'บันทึกเกม';
+                    saveButton.disabled = false;
+                }, 2000);
             }
         }
         
-        async function loadGame(name) {
-            try {
-                const response = await fetch(`${SCRIPT_URL}?saveId=${name}`);
-                const result = await response.json();
-                
-                if (result.status === "success") {
-                    console.log("พบข้อมูลเซฟ, กำลังโหลด...");
-                    const otherData = JSON.parse(result.data.gameDataJson);
-                    gameData = { gold: parseFloat(result.data.gold), ...otherData };
-                    
-                    if (!gameData.clickPower || gameData.clickPower.baseGpc === undefined) {
-                         gameData.clickPower = getInitialGameData().clickPower;
-                    }
-                } else {
-                    console.log("ไม่พบข้อมูลเซฟ, เริ่มเกมใหม่");
-                    gameData = getInitialGameData();
-                }
-            } catch (error) {
-                console.error('Error loading game:', error);
-                gameData = getInitialGameData();
-            }
-        }
+        async function loadGameData(name) { console.log(`กำลังตรวจสอบข้อมูลเซฟสำหรับ: ${name}...`); try { const response = await fetch(`${SCRIPT_URL}?saveId=${name}`); const result = await response.json(); if (result.status === "success" && result.data) { console.log("พบข้อมูลเซฟ, กำลังโหลด..."); const otherData = JSON.parse(result.data.gameDataJson); const loadedData = { gold: parseFloat(result.data.gold), ...otherData }; if (!loadedData.clickPower || loadedData.clickPower.baseGpc === undefined) { loadedData.clickPower = getInitialGameData().clickPower; } return loadedData; } else { console.log("ไม่พบข้อมูลเซฟ, จะเริ่มเกมใหม่"); return null; } } catch (error) { console.error('Error loading game:', error); alert('เกิดข้อผิดพลาดในการโหลดข้อมูล! จะเริ่มเกมใหม่'); return null; } }
         
-        // --- แก้ไข: ลบการบันทึกอัตโนมัติออกจากฟังก์ชันนี้ ---
-        async function initializeGame() {
-            playerName = playerNameInput.value.trim();
-            if (!playerName) {
-                alert('กรุณาใส่ชื่อของคุณก่อนเริ่มเกม!');
-                return;
-            }
-            
-            startScreen.style.display = 'none';
-            gameContainer.style.display = 'flex';
-            
-            await loadGame(playerName);
-            
-            initializeStore();
-            updateDisplay();
-            
-            setInterval(gameLoop, 1000);
-            
-            // ลบการบันทึกอัตโนมัติออกไปแล้ว
-        }
-
         // --- ฟังก์ชันอื่นๆ (เหมือนเดิม) ---
         function getInitialGameData() { return { gold: 0, clickPower: { name: 'พลั่วขุดทอง', count: 1, level: 1, baseGpc: 1, buyCost: 20, upgradeCost: 500 }, items: { miner: { name: 'คนงานเหมือง', count: 0, level: 1, baseCost: 15, currentCost: 15, baseGps: 0.2, upgradeCost: 150 }, minecart: { name: 'รถเข็นขนแร่', count: 0, level: 1, baseCost: 120, currentCost: 120, baseGps: 1.5, upgradeCost: 1200 }, smelter: { name: 'โรงหลอม', count: 0, level: 1, baseCost: 1300, currentCost: 1300, baseGps: 10, upgradeCost: 15000 }, excavator: { name: 'รถขุดเจาะ', count: 0, level: 1, baseCost: 15000, currentCost: 15000, baseGps: 60, upgradeCost: 220000 } } }; }
         function buyClickPower() { const cp = gameData.clickPower; if (gameData.gold >= cp.buyCost) { gameData.gold -= cp.buyCost; cp.count++; cp.buyCost = Math.ceil(20 * Math.pow(1.18, cp.count - 1)); updateDisplay(); } }
@@ -196,7 +167,7 @@
         function calculateTotalGpc() { const cp = gameData.clickPower; return cp.baseGpc * cp.count * Math.pow(2, cp.level - 1); }
         function mineGold() { const gpc = calculateTotalGpc(); gameData.gold += gpc; createFloatingNumber(gpc, clickButton); updateDisplay(); }
         function calculateTotalGps() { let totalGps = 0; if (!gameData.items) return 0; for (const itemId in gameData.items) { const item = gameData.items[itemId]; const itemGps = item.count * item.baseGps * Math.pow(2, item.level - 1); totalGps += itemGps; } return totalGps; }
-        function updateDisplay() { const totalGps = calculateTotalGps(); const totalGpc = calculateTotalGpc(); goldDisplay.innerText = Math.floor(gameData.gold).toLocaleString(); gpsDisplay.innerText = totalGps.toFixed(1).toLocaleString(); gpcDisplay.innerText = totalGpc.toLocaleString(); const cp = gameData.clickPower; const cpDiv = document.getElementById('click-upgrade-container'); if (cpDiv) { cpDiv.querySelector('.item-level').innerText = `Lv. ${cp.level}`; cpDiv.querySelector('.item-count').innerText = `จำนวน: ${cp.count}`; cpDiv.querySelector('.item-gpc').innerText = `GPC: ${totalGpc.toLocaleString()}`; const buyBtn = cpDiv.querySelector('.buy-click-btn'); const gpcPerBuy = cp.baseGpc * Math.pow(2, cp.level - 1); buyBtn.innerText = `ซื้อ (+${gpcPerBuy.toLocaleString()}) (${cp.buyCost.toLocaleString()})`; buyBtn.disabled = gameData.gold < cp.buyCost; const upgradeBtn = cpDiv.querySelector('.upgrade-click-btn'); upgradeBtn.innerText = `อัปเกรด (x2) (${cp.upgradeCost.toLocaleString()})`; upgradeBtn.disabled = gameData.gold < cp.upgradeCost; } for (const itemId in gameData.items) { const item = gameData.items[itemId]; const itemDiv = document.getElementById(`item-${itemId}`); if (itemDiv) { const itemGps = item.count * item.baseGps * Math.pow(2, item.level - 1); itemDiv.querySelector('.item-level').innerText = `Lv. ${item.level}`; itemDiv.querySelector('.item-count').innerText = `จำนวน: ${item.count}`; itemDiv.querySelector('.item-gps').innerText = `GPS: ${itemGps.toFixed(1)}`; const buyBtn = itemDiv.querySelector('.buy-btn'); buyBtn.innerText = `ซื้อ (${item.currentCost.toLocaleString()})`; buyBtn.disabled = gameData.gold < item.currentCost; const upgradeBtn = itemDiv.querySelector('.upgrade-btn'); upgradeBtn.innerText = `อัปเกรด (${item.upgradeCost.toLocaleString()})`; upgradeBtn.disabled = gameData.gold < item.upgradeCost || item.count === 0; } } }
+        function updateDisplay() { if (!gameData) return; const totalGps = calculateTotalGps(); const totalGpc = calculateTotalGpc(); goldDisplay.innerText = Math.floor(gameData.gold).toLocaleString(); gpsDisplay.innerText = totalGps.toFixed(1).toLocaleString(); gpcDisplay.innerText = totalGpc.toLocaleString(); const cp = gameData.clickPower; const cpDiv = document.getElementById('click-upgrade-container'); if (cpDiv) { cpDiv.querySelector('.item-level').innerText = `Lv. ${cp.level}`; cpDiv.querySelector('.item-count').innerText = `จำนวน: ${cp.count}`; cpDiv.querySelector('.item-gpc').innerText = `GPC: ${totalGpc.toLocaleString()}`; const buyBtn = cpDiv.querySelector('.buy-click-btn'); const gpcPerBuy = cp.baseGpc * Math.pow(2, cp.level - 1); buyBtn.innerText = `ซื้อ (+${gpcPerBuy.toLocaleString()}) (${cp.buyCost.toLocaleString()})`; buyBtn.disabled = gameData.gold < cp.buyCost; const upgradeBtn = cpDiv.querySelector('.upgrade-click-btn'); upgradeBtn.innerText = `อัปเกรด (x2) (${cp.upgradeCost.toLocaleString()})`; upgradeBtn.disabled = gameData.gold < cp.upgradeCost; } for (const itemId in gameData.items) { const item = gameData.items[itemId]; const itemDiv = document.getElementById(`item-${itemId}`); if (itemDiv) { const itemGps = item.count * item.baseGps * Math.pow(2, item.level - 1); itemDiv.querySelector('.item-level').innerText = `Lv. ${item.level}`; itemDiv.querySelector('.item-count').innerText = `จำนวน: ${item.count}`; itemDiv.querySelector('.item-gps').innerText = `GPS: ${itemGps.toFixed(1)}`; const buyBtn = itemDiv.querySelector('.buy-btn'); buyBtn.innerText = `ซื้อ (${item.currentCost.toLocaleString()})`; buyBtn.disabled = gameData.gold < item.currentCost; const upgradeBtn = itemDiv.querySelector('.upgrade-btn'); upgradeBtn.innerText = `อัปเกรด (${item.upgradeCost.toLocaleString()})`; upgradeBtn.disabled = gameData.gold < item.upgradeCost || item.count === 0; } } }
         function initializeStore() { const clickUpgradeContainer = document.getElementById('click-upgrade-container'); clickUpgradeContainer.innerHTML = ''; const cp = gameData.clickPower; const clickDiv = document.createElement('div'); clickDiv.className = 'click-upgrade-item'; clickDiv.innerHTML = `<div class="item-info"><span>${cp.name} <span class="item-level"></span></span><span class="item-count"></span></div><div class="item-stats"><span class="item-gpc"></span></div><div class="item-actions"><button class="buy-click-btn" onclick="buyClickPower()">ซื้อ</button><button class="upgrade-click-btn" onclick="upgradeClickPower()">อัปเกรด</button></div>`; clickUpgradeContainer.appendChild(clickDiv); const itemListDiv = document.getElementById('item-list'); itemListDiv.innerHTML = ''; for (const itemId in gameData.items) { const item = gameData.items[itemId]; const itemDiv = document.createElement('div'); itemDiv.className = 'item'; itemDiv.id = `item-${itemId}`; itemDiv.innerHTML = `<div class="item-info"><span>${item.name} <span class="item-level"></span></span><span class="item-count"></span></div><div class="item-stats"><span class="item-gps"></span></div><div class="item-actions"><button class="buy-btn" onclick="buyItem('${itemId}')">ซื้อ</button><button class="upgrade-btn" onclick="upgradeItem('${itemId}')">อัปเกรด</button></div>`; itemListDiv.appendChild(itemDiv); } }
         function createFloatingNumber(text, element) { const number = document.createElement('div'); number.textContent = `+${Math.floor(text)}`; number.style.position = 'absolute'; number.style.fontSize = '1.5em'; number.style.fontWeight = 'bold'; number.style.color = '#ffd700'; number.style.textShadow = '1px 1px 2px #4a2c0c'; number.style.pointerEvents = 'none'; number.style.transition = 'transform 1s ease-out, opacity 1s ease-out'; const rect = element.getBoundingClientRect(); const gameContainerRect = document.querySelector('.game-container').getBoundingClientRect(); const xOffset = (Math.random() - 0.5) * 80; const yOffset = -50 - (Math.random() * 20); number.style.left = `${rect.left - gameContainerRect.left + rect.width / 2 + xOffset}px`; number.style.top = `${rect.top - gameContainerRect.top + rect.height / 2 + yOffset}px`; document.querySelector('.game-container').appendChild(number); requestAnimationFrame(() => { number.style.transform = 'translateY(-80px)'; number.style.opacity = '0'; }); setTimeout(() => { number.remove(); }, 1000); }
         function gameLoop() { const totalGps = calculateTotalGps(); gameData.gold += totalGps; updateDisplay(); }
@@ -204,7 +175,9 @@
         // --- Event Listeners ---
         startGameButton.addEventListener('click', initializeGame);
         clickButton.addEventListener('click', mineGold);
-        saveButton.addEventListener('click', saveGame); // เพิ่ม Event Listener สำหรับปุ่ม Save
+        saveButton.addEventListener('click', saveGame);
+        confirmNewGameButton.addEventListener('click', () => { gameData = getInitialGameData(); startGameFlow(); });
+        cancelNewGameButton.addEventListener('click', hideNewPlayerConfirmPopup);
 
     </script>
 </body>
