@@ -86,14 +86,6 @@
             background-color: #512da8;
         }
 
-        #error-message {
-            color: #ff4d4d;
-        }
-
-        #demo {
-            margin-top: 20px;
-            font-size: 1.2em;
-        }
         .swal2-container.no-overlay {
             background-color: transparent !important;
         }
@@ -106,18 +98,14 @@
         <textarea id="question" name="ask" placeholder="ใส่คำถาม" rows="4" required></textarea>
         <textarea id="answer" name="answer" placeholder="ใส่คำตอบ" rows="4" required></textarea>
         <input type="submit" value="ส่ง">
-        <p id="demo"></p>
     </form>
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwgm1EeCbePWEFCOGnGB8l64f5on5k5-NssPhI5hN7c_5NLMLN3Pj_DoXwqX3QA2t0uow/exec';
         const form = document.forms['question'];
         const senderInput = document.getElementById('sender');
-        const titleInput = document.getElementById('title');
-        const questionInput = document.getElementById('question');
-        const answerInput = document.getElementById('answer');
-        const submitButton = document.querySelector('input[type="submit"]');  // กำหนดค่า submitButton
 
+        // โหลดชื่อผู้ส่งที่เคยบันทึกไว้เมื่อเปิดหน้าเว็บ
         const storedSender = localStorage.getItem('senderName');
         if (storedSender) {
             senderInput.value = storedSender;
@@ -131,71 +119,31 @@
                 confirmButtonText: 'ยืนยัน',
                 cancelButtonText: 'ยกเลิก',
                 customClass: {
-                container: 'no-overlay' // กำหนด class 'no-overlay' ให้กับ container
-            }
+                    container: 'no-overlay'
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Disable the submit button
-                    submitButton.disabled = true;
-                    submitButton.style.backgroundColor = '#ccc';
-                    submitButton.style.cursor = 'not-allowed';
-
+                    // 1. ส่งข้อมูลไปเบื้องหลัง (Fire-and-forget)
+                    // เราไม่ต้องรอการตอบกลับ แต่ยังดักจับ Error ไว้ใน Console ได้
                     fetch(scriptURL, { method: 'POST', body: new FormData(form) })
-                        .then(response => {
-                            if (!response.ok) {
-                                return response.text().then(text => {
-                                    throw new Error('HTTP error! Status: ' + response.status + ', ' + text);
-                                });
-                            }
-                            return response.json(); // Parse JSON
-                        })
-                        .then(data => {
-                            //Re-enable button after success
-                            submitButton.disabled = false;
-                            submitButton.style.backgroundColor = '#673ab7'; // Restore original color
-                            submitButton.style.cursor = 'pointer';
+                        .catch(error => console.error('Error!', error.message));
 
-                            if (data.result === "success") { // ตรวจสอบ result
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'ส่งเรียบร้อยแล้ว',
-                                    showConfirmButton: false,
-                                    timer: 3000,
-                                    customClass: {
-                                    container: 'no-overlay' // กำหนด class 'no-overlay' ให้กับ container
-                                  }
-                                });
-                                form.reset();
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'เกิดข้อผิดพลาด',
-                                    text: data.error || 'Unknown error', // แสดง error message จาก Apps Script
-                                    timer: 3000,
-                                    customClass: {
-                                    container: 'no-overlay' // กำหนด class 'no-overlay' ให้กับ container
-                                  }
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            //Re-enable button after failure
-                            submitButton.disabled = false;
-                            submitButton.style.backgroundColor = '#673ab7'; // Restore original color
-                            submitButton.style.cursor = 'pointer';
+                    // 2. แสดงผลว่าสำเร็จทันที
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ส่งเรียบร้อยแล้ว',
+                        showConfirmButton: false,
+                        timer: 2000, // แสดงผล 2 วินาที
+                        customClass: {
+                            container: 'no-overlay'
+                        }
+                    });
 
-                            console.error('Error:', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'เกิดข้อผิดพลาด',
-                                text: error.message
-                            });
-                        });
-                } else {
-                    //If cancel is pressed, still re-enable the button
-                    submitButton.disabled = false;
-                    submitButton.style.backgroundColor = '#673ab7'; // Restore original color
-                    submitButton.style.cursor = 'pointer';
+                    // 3. บันทึกชื่อผู้ส่งไว้ใช้ครั้งถัดไป และรีเซ็ตฟอร์ม
+                    const senderNameValue = senderInput.value; // เก็บค่าชื่อผู้ส่งไว้ก่อน
+                    localStorage.setItem('senderName', senderNameValue); // บันทึกลง Storage
+                    form.reset(); // ล้างข้อมูลในฟอร์มทั้งหมด
+                    senderInput.value = senderNameValue; // นำชื่อผู้ส่งกลับมาใส่ในช่องเหมือนเดิม
                 }
             });
         }
