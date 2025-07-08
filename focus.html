@@ -15,6 +15,7 @@
             font-family: 'Comic Neue', sans-serif;
             text-align: center;
             padding: 20px;
+            color: #ffffff;
         }
 
         form {
@@ -24,260 +25,153 @@
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-            position: relative;
-            display: block;
+            display: flex;
             flex-direction: column;
             align-items: center;
-            height: 450px;
-            overflow: hidden; /* Add this line */
+            gap: 15px;
         }
 
-        form::before {
-            content: "";
-            position: absolute;
-            top: -30px;
-            right: -30px;
-            width: 150px;
-            height: 150px;
-            background-size: contain;
-            opacity: 0.4;
-            z-index: 1;
-        }
-
-        form > * {
-            position: relative;
-            z-index: 2;
-        }
-
-        form .main-container {
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        form .image-container {
-            width: 200px;
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        form .image-container img {
-            max-width: 100%;
-            height: 325px;
-        }
-
-        form input {
+        form input[type="text"] {
             font-size: 1.0em;
             display: block;
-            width: calc(250px - 20px);
-            padding: 3px;
+            width: 100%;
+            padding: 8px;
             margin: 5px 0;
             border: 2px solid rgb(151, 151, 151);
-            border-radius: 3px;
+            border-radius: 5px;
             box-sizing: border-box;
             background: #464545;
             color: #ffffff;
         }
 
-        form input::placeholder {
-            color: #aaa;
-        }
-
-        form input[type="submit"] {
-            background-color: #ff2767;
-            color: #ffffff;
-            border: none;
-            padding: 15px 55px;
-            font-size: 1.1em;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
-            width: auto;
-            position: absolute;
-            bottom: 20px;
-            left: 270px;
-            transform: translateX(-50%);
-        }
-
-        form input[type="submit"]:hover {
-            background-color: #ff004c;
-        }
-
-        form #demo {
-            margin-top: 20px;
-            font-size: 1.2em;
-        }
-        
-        form #youtube-name-container {
-            position: absolute;
-            top: 16px;
-            left: 310px;
-            transform: translateX(-50%);
-        }
-
-        form #answer1-container {
-            position: absolute;
-            top: 88px;
-            left: 210px;
-        }
-
-        form #answer2-container {
-            position: absolute;
-            top: 170px;
-            left: 210px;
-        }
-
-        form #answer3-container {
-            position: absolute;
-            top: 253px;
-            left: 210px;
-        }
-
-        form #answer4-container {
-            position: absolute;
-            top: 337px;
-            left: 210px;
-        }
-
-        form .answer-group {
-            width: 300px;
-        }
-        .swal2-container.no-overlay {
-            background-color: transparent !important;
-        }
+        form input::placeholder { color: #aaa; }
+        .image-selection-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; margin: 10px 0; }
+        .image-option { position: relative; }
+        .image-number-overlay { position: absolute; top: 10px; left: 10px; background-color: rgba(0, 0, 0, 0.7); color: #ffffff; padding: 4px 12px; border-radius: 20px; font-size: 1em; font-weight: 700; z-index: 5; pointer-events: none; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .image-option label { cursor: pointer; display: block; }
+        .image-option img { width: 100%; height: auto; border-radius: 8px; border: 4px solid transparent; transition: all 0.2s ease-in-out; display: block; }
+        .image-option img:hover { transform: scale(1.05); border-color: rgba(255, 39, 103, 0.5); }
+        .image-option input[type="radio"]:checked + label img { border-color: #ff2767; box-shadow: 0 0 15px #ff2767; transform: scale(1.05); }
+        .form-group { width: 80%; text-align: left; }
+        .form-group label { margin-bottom: 5px; font-weight: bold; display: block; }
+        form input[type="submit"] { background-color: #ff2767; color: #ffffff; border: none; padding: 15px 55px; font-size: 1.1em; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; width: auto; margin-top: 10px; }
+        form input[type="submit"]:hover { background-color: #ff004c; }
+        .swal2-container.no-overlay { background-color: transparent !important; }
     </style>
 </head>
 <body>
     <form action="" method="post" onsubmit="validateAndSubmitForm(event);" accept-charset="UTF-8" autocomplete="off" name="question">
 
-        <div class="main-container">
-            <div class="image-container">
-                <img src="https://xionero.github.io/melblack/game.jpg" alt="Main Image">
+        <!-- Name Input -->
+        <div class="form-group">
+            <label for="sender">ชื่อ Youtube ของคุณ</label>
+            <!-- สำคัญ: ต้องมี id="sender" เพื่อให้ Javascript หาเจอ -->
+            <input type="text" id="sender" name="youtube_name" placeholder="ใส่ชื่อของคุณที่นี่" required>
+        </div>
+        
+        <p>เลือกตอบเพียง 1 รูปแต่ละรูปจะได้คะแนนไม่เท่ากัน</p>
+        
+        <!-- Image Selection -->
+        <div class="image-selection-container">
+            <div class="image-option">
+                <div class="image-number-overlay">+1</div>
+                <input type="radio" id="img1" name="selectedImage" value="Image 1" style="display:none;">
+                <label for="img1"><img src="https://xionero.github.io/melblack/1.jpg" alt="1"></label>
             </div>
-
-            <div class="answers-container">
-
+            <div class="image-option">
+                <div class="image-number-overlay">+2</div>
+                <input type="radio" id="img2" name="selectedImage" value="Image 2" style="display:none;">
+                <label for="img2"><img src="https://xionero.github.io/melblack/2.jpg" alt="2"></label>
+            </div>
+            <div class="image-option">
+                <div class="image-number-overlay">+3</div>
+                <input type="radio" id="img3" name="selectedImage" value="Image 3" style="display:none;">
+                <label for="img3"><img src="https://xionero.github.io/melblack/3.jpg" alt="3"></label>
+            </div>
+            <div class="image-option">
+                <div class="image-number-overlay">+4</div>
+                <input type="radio" id="img4" name="selectedImage" value="Image 4" style="display:none;">
+                <label for="img4"><img src="https://xionero.github.io/melblack/4.jpg" alt="4"></label>
             </div>
         </div>
 
-        <div class="answer-group" id="youtube-name-container">
-            <input type="text" id="sender" name="youtube_name" placeholder="ชื่อของคุณ" required>
-        </div>
-        <div class="answer-group" id="answer1-container">
-            <input id="answer1" name="answer1" placeholder="คำตอบ 1">
-        </div>
-        <div class="answer-group" id="answer2-container">
-            <input id="answer2" name="answer2" placeholder="คำตอบ 2">
-        </div>
-        <div class="answer-group" id="answer3-container">
-            <input id="answer3" name="answer3" placeholder="คำตอบ 3">
-        </div>
-        <div class="answer-group" id="answer4-container">
-            <input id="answer4" name="answer4" placeholder="คำตอบ 4">
+        <!-- Single Answer Input -->
+        <div class="form-group">
+             <label for="answer">คำตอบ</label>
+             <!-- สำคัญ: ต้องมี id="answer" เพื่อให้ Javascript หาเจอ -->
+             <input type="text" id="answer" name="answer" placeholder="ใส่คำตอบ">
         </div>
 
-        <input type="submit" value="ส่ง" id="submitButton">
+        <input type="submit" value="ส่งคำตอบ" id="submitButton">
 
-        <p id="demo"></p>
     </form>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbybL2f82OVsFK00NODA_WIFHadUd0DDWqON8B2DQK2q1HLi-LC672LoR0BoaePkDSeHxg/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzKHjlvHYs5BRfXXUKIOJ2I3JmXqaFjwp795dN7kjLwww8CFYzJPmE9WXpw9NxmmbX8jw/exec';
         const form = document.forms['question'];
-        const submitButton = document.getElementById('submitButton'); // Get the submit button
+        const submitButton = document.getElementById('submitButton');
 
         function validateAndSubmitForm(event) {
             event.preventDefault();
-            const answer1 = document.getElementById('answer1').value.trim();
-            const answer2 = document.getElementById('answer2').value.trim();
-            const answer3 = document.getElementById('answer3').value.trim();
-            const answer4 = document.getElementById('answer4').value.trim();
+            
+            // โค้ดส่วนนี้ต้องการ id="sender" และ id="answer" ใน HTML
+            const sender = document.getElementById('sender').value.trim();
+            const selectedImage = document.querySelector('input[name="selectedImage"]:checked');
+            const answer = document.getElementById('answer').value.trim();
 
-            if (answer1 === '' && answer2 === '' && answer3 === '' && answer4 === '') {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'กรุณาตอบคำถามอย่างน้อยหนึ่งข้อ',
-                });
-                return false;
+            if (sender === '') {
+                Swal.fire({ icon: 'warning', title: 'กรุณากรอกชื่อของคุณ', });
+                return;
             }
-
+            if (!selectedImage) {
+                Swal.fire({ icon: 'warning', title: 'กรุณาเลือกรูปภาพ', text: 'คลิกที่รูปภาพเพื่อเลือก' });
+                return;
+            }
+            if (answer === '') {
+                Swal.fire({ icon: 'warning', title: 'กรุณากรอกคำตอบ', });
+                return;
+            }
             submitForm();
         }
 
         function submitForm() {
             Swal.fire({
-                title: 'ยืนยันการส่งหรือไม่?',
+                title: 'ยืนยันการส่งคำตอบหรือไม่?',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'ยืนยัน',
                 cancelButtonText: 'ยกเลิก',
-                customClass: {
-                container: 'no-overlay' // กำหนด class 'no-overlay' ให้กับ container
-            }
+                customClass: { container: 'no-overlay' }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Disable the submit button
                     submitButton.disabled = true;
-                    submitButton.style.backgroundColor = '#ccc'; //optional: change the button's appearance to indicate it's disabled
-                    submitButton.style.cursor = 'not-allowed'; //optional: change cursor
-
+                    submitButton.style.backgroundColor = '#ccc';
+                    submitButton.style.cursor = 'not-allowed';
                     fetch(scriptURL, { method: 'POST', body: new FormData(form) })
                         .then(response => {
                             if (!response.ok) {
-                                return response.text().then(text => {
-                                    throw new Error('HTTP error! Status: ' + response.status + ', ' + text);
-                                });
+                                return response.text().then(text => { throw new Error('HTTP error! Status: ' + response.status + ', ' + text); });
                             }
-                            return response.json(); // Parse JSON
+                            return response.json();
                         })
                         .then(data => {
-                            //Re-enable button after success
                             submitButton.disabled = false;
-                            submitButton.style.backgroundColor = '#ff2767'; //Restore original color
-                            submitButton.style.cursor = 'pointer'; //Restore cursor
-
-                            if (data.result === "success") { // ตรวจสอบ result
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'ส่งเรียบร้อยแล้ว',
-                                    showConfirmButton: false,
-                                    timer: 3000,
-                                    customClass: {
-                                    container: 'no-overlay' // กำหนด class 'no-overlay' ให้กับ container
-                                  }
-                                 });
+                            submitButton.style.backgroundColor = '#ff2767';
+                            submitButton.style.cursor = 'pointer';
+                            if (data.result === "success") {
+                                Swal.fire({ icon: 'success', title: 'ส่งคำตอบเรียบร้อยแล้ว!', showConfirmButton: false, timer: 3000, customClass: { container: 'no-overlay' } });
                                 form.reset();
                             } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'เกิดข้อผิดพลาด',
-                                    text: data.error || 'Unknown error', // แสดง error message จาก Apps Script
-                                    timer: 3000,
-                                    customClass: {
-                                    container: 'no-overlay' // กำหนด class 'no-overlay' ให้กับ container
-                                  }
-                                });
+                                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: data.error || 'Unknown error', timer: 3000, customClass: { container: 'no-overlay' } });
                             }
                         })
                         .catch(error => {
-                            //Re-enable button after failure
                             submitButton.disabled = false;
-                            submitButton.style.backgroundColor = '#ff2767'; //Restore original color
-                            submitButton.style.cursor = 'pointer'; //Restore cursor
-
+                            submitButton.style.backgroundColor = '#ff2767';
+                            submitButton.style.cursor = 'pointer';
                             console.error('Error:', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'เกิดข้อผิดพลาด',
-                                text: error.message
-                            });
+                            Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาดในการส่ง', text: error.message });
                         });
-                } else {
-                  //If cancel is pressed, still re-enable the button
-                  submitButton.disabled = false;
-                  submitButton.style.backgroundColor = '#ff2767'; //Restore original color
-                  submitButton.style.cursor = 'pointer'; //Restore cursor
                 }
             });
         }
