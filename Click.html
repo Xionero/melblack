@@ -9,7 +9,7 @@
 
         body {
             font-family: 'Kanit', sans-serif;
-            background-color: transparent; /* ตามที่คุณแก้ไข */
+            background-color: transparent;
             color: #4a2c0c;
             display: flex;
             justify-content: center;
@@ -68,19 +68,56 @@
         #click-button { background: none; border: none; cursor: pointer; padding: 0; transition: transform 0.1s ease-out; }
         #click-button:active { transform: scale(0.95); }
         #click-button img { width: 200px; }
-        .store-container h2 { text-align: center; margin-top: 0; border-bottom: 2px solid #a8936a; padding-bottom: 10px; }
+        
+        /* === START: ส่วนที่แก้ไขให้เล็กลง === */
+        .store-container h2 {
+            text-align: center;
+            margin-top: 0;
+            border-bottom: 2px solid #a8936a;
+            padding-bottom: 8px; /* แก้ไข: ลด padding */
+            margin-bottom: 10px; /* เพิ่ม: จัดการระยะห่างใต้เส้น */
+            font-size: 1.3em; /* แก้ไข: ลดขนาดฟอนต์หัวข้อ */
+        }
         
         /* สไตล์สำหรับไอเทมและไอเทมอัปเกรดคลิก ใช้ร่วมกันได้ */
         .item, .click-upgrade-item { 
-            background-color: #e6d8b8; padding: 10px; border-radius: 8px; border: 2px solid #a8936a; 
-            display: flex; flex-direction: column; gap: 8px; 
+            background-color: #e6d8b8;
+            padding: 8px; /* แก้ไข: ลด padding */
+            border-radius: 8px;
+            border: 2px solid #a8936a; 
+            display: flex;
+            flex-direction: column;
+            gap: 6px; /* แก้ไข: ลดช่องว่าง */
         }
-        .click-upgrade-item { background-color: #fffacd; } /* ทำให้สีต่างออกไปเล็กน้อย */
+        .click-upgrade-item { background-color: #fffacd; }
 
-        .item-info { display: flex; justify-content: space-between; font-weight: bold; }
-        .item-stats { font-size: 0.9em; color: #6c481c; }
-        .item-actions { display: flex; gap: 10px; }
-        .item-actions button { flex: 1; padding: 8px; font-family: 'Kanit', sans-serif; font-size: 1em; border-radius: 5px; border: 2px solid #8c6f3e; cursor: pointer; background-color: #f5e5b8; transition: background-color 0.2s; }
+        .item-info {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 0.95em; /* เพิ่ม: ลดขนาดฟอนต์เล็กน้อย */
+        }
+        .item-stats {
+            font-size: 0.85em; /* แก้ไข: ลดขนาดฟอนต์ */
+            color: #6c481c;
+        }
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .item-actions button {
+            flex: 1;
+            padding: 6px; /* แก้ไข: ลด padding ของปุ่ม */
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.9em; /* แก้ไข: ลดขนาดฟอนต์บนปุ่ม */
+            border-radius: 5px;
+            border: 2px solid #8c6f3e;
+            cursor: pointer;
+            background-color: #f5e5b8;
+            transition: background-color 0.2s;
+        }
+        /* === END: ส่วนที่แก้ไขให้เล็กลง === */
+
         .item-actions button:hover:not(:disabled) { background-color: #ffd700; }
         .item-actions button:disabled { background-color: #b0a38d; cursor: not-allowed; color: #7d6b50; border-color: #9c8b70; }
     </style>
@@ -94,7 +131,6 @@
                 <h1 id="gold-display">0</h1>
                 <p>ทอง</p>
                 <p>อัตราการผลิต: <span id="gps-display">0</span> ทอง/วินาที</p>
-                <!-- เพิ่มการแสดงผลพลังคลิก -->
                 <p>พลังคลิก: <span id="gpc-display">1</span></p>
             </div>
             <div class="main-action">
@@ -115,12 +151,10 @@
         <div class="right-panel">
             <div class="store-container">
                 <h2>ร้านค้า & อัปเกรด</h2>
-                <!-- === HTML ส่วนที่เพิ่มใหม่ === -->
                 <div id="click-upgrade-container">
                     <!-- UI ของอัปเกรดคลิกจะถูกสร้างที่นี่ -->
                 </div>
-                <hr>
-                <!-- === สิ้นสุดส่วนที่เพิ่มใหม่ === -->
+                <hr style="border-color: #a8936a; border-style: solid; border-width: 1px 0 0 0;">
                 <div id="item-list"></div>
             </div>
         </div>
@@ -135,15 +169,13 @@
             return {
                 gold: 0,
                 goldPerClick: 1,
-                // === ส่วนที่เพิ่มใหม่: ข้อมูลการอัปเกรดคลิก ===
                 clickUpgrade: {
                     name: 'ถุงมือทองคำ',
                     level: 1,
                     maxLevel: 10,
-                    baseCost: 50, // ราคาเริ่มต้นสำหรับการอัปเกรดเป็น Lv.2
+                    baseCost: 50,
                     currentCost: 50
                 },
-                // ===========================================
                 items: {
                     miner: { name: 'คนงานเหมือง', count: 0, level: 1, baseCost: 15, currentCost: 15, baseGps: 0.1, upgradeCost: 100 },
                     minecart: { name: 'รถเข็นขนแร่', count: 0, level: 1, baseCost: 100, currentCost: 100, baseGps: 1, upgradeCost: 1000 },
@@ -157,105 +189,31 @@
         // ========= DOM ELEMENTS =========
         const goldDisplay = document.getElementById('gold-display');
         const gpsDisplay = document.getElementById('gps-display');
-        const gpcDisplay = document.getElementById('gpc-display'); // Element ใหม่
+        const gpcDisplay = document.getElementById('gpc-display');
         const clickButton = document.getElementById('click-button');
         const itemListDiv = document.getElementById('item-list');
-        const clickUpgradeContainer = document.getElementById('click-upgrade-container'); // Element ใหม่
+        const clickUpgradeContainer = document.getElementById('click-upgrade-container');
         const saveIdInput = document.getElementById('save-id-input');
         const saveButton = document.getElementById('save-button');
         const loadButton = document.getElementById('load-button');
 
-        // ========= SAVE/LOAD FUNCTIONS (เหมือนเดิม) =========
-        async function saveGame() { /* ... โค้ดส่วนนี้เหมือนเดิม ... */ }
-        async function loadGame() { /* ... โค้ดส่วนนี้เหมือนเดิม ... */ }
-        
-        // ========= EXISTING GAME FUNCTIONS (มีการแก้ไขและเพิ่มเติม) =========
+        // ========= GAME FUNCTIONS =========
         function mineGold() {
             gameData.gold += gameData.goldPerClick;
             updateDisplay();
         }
 
-        // === ฟังก์ชันใหม่: สำหรับซื้อการอัปเกรดคลิก ===
         function buyClickUpgrade() {
             const upgrade = gameData.clickUpgrade;
             if (upgrade.level < upgrade.maxLevel && gameData.gold >= upgrade.currentCost) {
                 gameData.gold -= upgrade.currentCost;
                 upgrade.level++;
-                gameData.goldPerClick = upgrade.level; // อัปเดตพลังคลิก!
-                
-                // คำนวณราคาใหม่ให้แพงขึ้นแบบทวีคูณ
+                gameData.goldPerClick = upgrade.level;
                 upgrade.currentCost = Math.ceil(upgrade.baseCost * Math.pow(2.5, upgrade.level - 1));
-                
                 updateDisplay();
             }
         }
 
-        function buyItem(itemId) { /* ... โค้ดส่วนนี้เหมือนเดิม ... */ }
-        function upgradeItem(itemId) { /* ... โค้ดส่วนนี้เหมือนเดิม ... */ }
-        function calculateTotalGps() { /* ... โค้ดส่วนนี้เหมือนเดิม ... */ }
-        
-        function updateDisplay() {
-            const totalGps = calculateTotalGps();
-            goldDisplay.innerText = Math.floor(gameData.gold).toLocaleString();
-            gpsDisplay.innerText = totalGps.toFixed(1).toLocaleString();
-            gpcDisplay.innerText = gameData.goldPerClick.toLocaleString(); // อัปเดตการแสดงผลพลังคลิก
-
-            // === ส่วนที่เพิ่มใหม่: อัปเดต UI ของอัปเกรดคลิก ===
-            const upgrade = gameData.clickUpgrade;
-            const upgradeBtn = document.getElementById('click-upgrade-btn');
-            const upgradeLevelText = document.getElementById('click-upgrade-level');
-            if(upgradeBtn && upgradeLevelText) {
-                upgradeLevelText.innerText = `Lv. ${upgrade.level}`;
-                if (upgrade.level >= upgrade.maxLevel) {
-                    upgradeBtn.innerText = 'สูงสุดแล้ว';
-                    upgradeBtn.disabled = true;
-                } else {
-                    upgradeBtn.innerText = `อัปเกรด (${upgrade.currentCost.toLocaleString()})`;
-                    upgradeBtn.disabled = gameData.gold < upgrade.currentCost;
-                }
-            }
-            // ===========================================
-
-            // อัปเดตข้อมูลไอเทมแต่ละชิ้น (เหมือนเดิม)
-            for (const itemId in gameData.items) { /* ... โค้ดส่วนนี้เหมือนเดิม ... */ }
-        }
-
-        function initializeStore() {
-            // === ส่วนที่เพิ่มใหม่: สร้าง UI ของอัปเกรดคลิกครั้งแรก ===
-            const upgrade = gameData.clickUpgrade;
-            const upgradeDiv = document.createElement('div');
-            upgradeDiv.className = 'click-upgrade-item';
-            upgradeDiv.innerHTML = `
-                <div class="item-info">
-                    <span>${upgrade.name} <span id="click-upgrade-level">Lv. ${upgrade.level}</span></span>
-                </div>
-                <div class="item-stats">
-                    <span>เพิ่มพลังการคลิก +1 ต่อเลเวล</span>
-                </div>
-                <div class="item-actions">
-                    <button id="click-upgrade-btn" onclick="buyClickUpgrade()">อัปเกรด (${upgrade.currentCost.toLocaleString()})</button>
-                </div>
-            `;
-            clickUpgradeContainer.appendChild(upgradeDiv);
-            // ===========================================
-            
-            itemListDiv.innerHTML = ''; // ล้างร้านค้าเก่าก่อน
-            for (const itemId in gameData.items) { /* ... โค้ดส่วนนี้เหมือนเดิม ... */ }
-        }
-        
-        function gameLoop() { /* ... โค้ดส่วนนี้เหมือนเดิม ... */ }
-
-        // ========= INITIALIZE GAME =========
-        clickButton.addEventListener('click', mineGold);
-        saveButton.addEventListener('click', saveGame);
-        loadButton.addEventListener('click', loadGame);
-        
-        initializeStore();
-        setInterval(gameLoop, 1000);
-        updateDisplay();
-
-
-        // === โค้ดส่วนที่คัดลอกมาเพื่อความสมบูรณ์ ===
         async function saveGame() {
             const saveId = saveIdInput.value.trim();
             if (!saveId) {
@@ -283,6 +241,7 @@
                 saveButton.disabled = false;
             }
         }
+
         async function loadGame() {
             const saveId = saveIdInput.value.trim();
             if (!saveId) {
@@ -295,13 +254,13 @@
                 const response = await fetch(`${SCRIPT_URL}?saveId=${saveId}`);
                 const result = await response.json();
                 if (result.status === "success") {
-                    // *** สำคัญ: ต้องตรวจสอบว่าข้อมูลที่โหลดมามี clickUpgrade หรือไม่ ***
                     const loadedData = JSON.parse(result.data);
                     if (!loadedData.clickUpgrade) {
-                        // ถ้าเป็นเซฟเก่าที่ยังไม่มีข้อมูลนี้ ให้เพิ่มเข้าไป
                         loadedData.clickUpgrade = getInitialGameData().clickUpgrade;
                     }
                     gameData = loadedData;
+                    // หลังจากโหลดข้อมูลใหม่ ต้องวาดร้านค้าใหม่ทั้งหมดเพื่อให้ผูกกับข้อมูลล่าสุด
+                    initializeStore();
                     alert(`โหลดข้อมูลสำหรับรหัส "${saveId}" สำเร็จ!`);
                     updateDisplay();
                 } else if (result.status === "not_found") {
@@ -317,6 +276,7 @@
                 loadButton.disabled = false;
             }
         }
+
         function buyItem(itemId) {
             const item = gameData.items[itemId];
             if (gameData.gold >= item.currentCost) {
@@ -326,6 +286,7 @@
                 updateDisplay();
             }
         }
+
         function upgradeItem(itemId) {
             const item = gameData.items[itemId];
             if (gameData.gold >= item.upgradeCost) {
@@ -335,9 +296,10 @@
                 updateDisplay();
             }
         }
+
         function calculateTotalGps() {
             let totalGps = 0;
-            if (!gameData.items) return 0; // ป้องกัน error ตอนโหลดข้อมูลเก่า
+            if (!gameData.items) return 0;
             for (const itemId in gameData.items) {
                 const item = gameData.items[itemId];
                 const itemGps = item.count * item.baseGps * Math.pow(2, item.level - 1);
@@ -345,17 +307,14 @@
             }
             return totalGps;
         }
-        function gameLoop() {
-            const totalGps = calculateTotalGps();
-            gameData.gold += totalGps;
-            updateDisplay();
-        }
+
         function updateDisplay() {
             const totalGps = calculateTotalGps();
             goldDisplay.innerText = Math.floor(gameData.gold).toLocaleString();
             gpsDisplay.innerText = totalGps.toFixed(1).toLocaleString();
             gpcDisplay.innerText = gameData.goldPerClick.toLocaleString();
             
+            // อัปเดต UI ของอัปเกรดคลิก
             const upgrade = gameData.clickUpgrade;
             const upgradeBtn = document.getElementById('click-upgrade-btn');
             const upgradeLevelText = document.getElementById('click-upgrade-level');
@@ -370,6 +329,7 @@
                 }
             }
 
+            // อัปเดตข้อมูลไอเทมแต่ละชิ้น
             for (const itemId in gameData.items) {
                 const item = gameData.items[itemId];
                 const itemDiv = document.getElementById(`item-${itemId}`);
@@ -387,7 +347,9 @@
                 }
             }
         }
+        
         function initializeStore() {
+            // สร้าง UI ของอัปเกรดคลิก
             clickUpgradeContainer.innerHTML = '';
             const upgrade = gameData.clickUpgrade;
             const upgradeDiv = document.createElement('div');
@@ -405,6 +367,7 @@
             `;
             clickUpgradeContainer.appendChild(upgradeDiv);
             
+            // สร้าง UI ของไอเทมปกติ
             itemListDiv.innerHTML = '';
             for (const itemId in gameData.items) {
                 const item = gameData.items[itemId];
@@ -426,6 +389,21 @@
                 itemListDiv.appendChild(itemDiv);
             }
         }
+        
+        function gameLoop() {
+            const totalGps = calculateTotalGps();
+            gameData.gold += totalGps;
+            updateDisplay();
+        }
+
+        // ========= INITIALIZE GAME =========
+        clickButton.addEventListener('click', mineGold);
+        saveButton.addEventListener('click', saveGame);
+        loadButton.addEventListener('click', loadGame);
+        
+        initializeStore();
+        setInterval(gameLoop, 1000);
+        updateDisplay();
     </script>
 </body>
 </html>
