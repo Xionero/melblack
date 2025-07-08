@@ -9,72 +9,17 @@
         
         body { font-family: 'Kanit', sans-serif; background-color: #5a4e3a; color: #4a2c0c; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; user-select: none; }
         
-        /* --- สไตล์สำหรับหน้าจอเริ่มต้น --- */
-        #start-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.75);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        #start-modal {
-            background-color: #c8b68e;
-            padding: 30px 40px;
-            border-radius: 15px;
-            text-align: center;
-            border: 3px solid #a8936a;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-        #start-modal h2 {
-            margin-top: 0;
-            font-size: 1.8em;
-            color: #4a2c0c;
-        }
-        #player-name-input {
-            padding: 12px;
-            width: 250px;
-            border-radius: 5px;
-            border: 2px solid #a8936a;
-            font-family: 'Kanit', sans-serif;
-            font-size: 1.2em;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        #start-game-button {
-            padding: 10px 30px;
-            font-family: 'Kanit', sans-serif;
-            font-size: 1.2em;
-            border-radius: 8px;
-            border: 2px solid #8c6f3e;
-            cursor: pointer;
-            background-color: #a8e6cf;
-            transition: background-color 0.2s, transform 0.1s;
-        }
-        #start-game-button:hover {
-            background-color: #81c7a8;
-        }
-         #start-game-button:active {
-            transform: scale(0.98);
-        }
+        /* --- สไตล์หน้าจอเริ่มต้น (เหมือนเดิม) --- */
+        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        #start-modal { background-color: #c8b68e; padding: 30px 40px; border-radius: 15px; text-align: center; border: 3px solid #a8936a; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        #start-modal h2 { margin-top: 0; font-size: 1.8em; color: #4a2c0c; }
+        #player-name-input { padding: 12px; width: 250px; border-radius: 5px; border: 2px solid #a8936a; font-family: 'Kanit', sans-serif; font-size: 1.2em; text-align: center; margin-bottom: 20px; }
+        #start-game-button { padding: 10px 30px; font-family: 'Kanit', sans-serif; font-size: 1.2em; border-radius: 8px; border: 2px solid #8c6f3e; cursor: pointer; background-color: #a8e6cf; transition: background-color 0.2s, transform 0.1s; }
+        #start-game-button:hover { background-color: #81c7a8; }
+        #start-game-button:active { transform: scale(0.98); }
 
         /* --- สไตล์เกมหลัก --- */
-        .game-container { 
-            display: none; 
-            position: relative; 
-            width: 800px; 
-            max-width: 95%; 
-            background-color: #c8b68e; 
-            border-radius: 15px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
-            padding: 20px; 
-            flex-direction: row;
-            gap: 20px; 
-        }
+        .game-container { display: none; position: relative; width: 800px; max-width: 95%; background-color: #c8b68e; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); padding: 20px; flex-direction: row; gap: 20px; }
         .left-panel, .right-panel { flex: 1; display: flex; flex-direction: column; gap: 15px; }
         .stats-container { background-color: #e6d8b8; padding: 15px; border-radius: 10px; text-align: center; border: 2px solid #a8936a; }
         .stats-container h1 { margin: 0; font-size: 2.5em; color: #d4af37; text-shadow: 1px 1px 2px #4a2c0c; }
@@ -83,6 +28,24 @@
         #click-button { background: none; border: none; cursor: pointer; padding: 0; transition: transform 0.1s ease-out; }
         #click-button:active { transform: scale(0.95); }
         #click-button img { width: 200px; }
+        
+        /* --- ใหม่: สไตล์สำหรับปุ่มบันทึกเกม --- */
+        .save-container { background-color: #e6d8b8; padding: 15px; border-radius: 10px; border: 2px solid #a8936a; display: flex; }
+        #save-button {
+            flex: 1;
+            padding: 10px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.1em;
+            border-radius: 5px;
+            border: 2px solid #8c6f3e;
+            cursor: pointer;
+            background-color: #a8e6cf;
+            transition: background-color 0.2s;
+        }
+        #save-button:hover { background-color: #81c7a8; }
+        #save-button:disabled { background-color: #b0a38d; cursor: not-allowed; color: #7d6b50; border-color: #9c8b70; }
+
+        /* --- สไตล์ร้านค้า (เหมือนเดิม) --- */
         .store-container h2 { text-align: center; margin-top: 0; border-bottom: 2px solid #a8936a; padding-bottom: 8px; margin-bottom: 10px; font-size: 1.3em; }
         .item, .click-upgrade-item { background-color: #e6d8b8; padding: 8px; border-radius: 8px; border: 2px solid #a8936a; display: flex; flex-direction: column; gap: 6px; }
         .click-upgrade-item { background-color: #fffacd; }
@@ -99,7 +62,7 @@
         <div id="start-modal">
             <h2>เหมืองทองคำมหาสนุก</h2>
             <input type="text" id="player-name-input" placeholder="ใส่ชื่อของคุณที่นี่">
-            <button id="start-game-button">เริ่มเกม / โหลดเกม</button>
+            <button id="start-game-button">เริ่มเกม</button>
         </div>
     </div>
 
@@ -113,6 +76,10 @@
             </div>
             <div class="main-action">
                 <button id="click-button"><img src="https://i.pinimg.com/originals/04/4d/12/044d12b83f0f1aa1012563a4701b0531.gif" alt="Gold Pile"></button>
+            </div>
+            <!-- ใหม่: เพิ่มปุ่มบันทึกกลับเข้ามา -->
+            <div class="save-container">
+                <button id="save-button">บันทึกเกม</button>
             </div>
         </div>
         <div class="right-panel">
@@ -131,6 +98,7 @@
         let gameData;
         let playerName = '';
 
+        // --- DOM Elements ---
         const startScreen = document.getElementById('start-screen');
         const playerNameInput = document.getElementById('player-name-input');
         const startGameButton = document.getElementById('start-game-button');
@@ -140,17 +108,21 @@
         const gpsDisplay = document.getElementById('gps-display');
         const gpcDisplay = document.getElementById('gpc-display');
         const clickButton = document.getElementById('click-button');
+        const saveButton = document.getElementById('save-button'); // เพิ่มปุ่ม Save เข้ามา
 
-        // --- ฟังก์ชันบันทึกอัตโนมัติ (แก้ไขแล้ว) ---
-        async function saveGame(isSilent = false) {
+        // --- แก้ไข: ฟังก์ชันบันทึกเกมแบบ Manual ---
+        async function saveGame() {
             if (!playerName) return;
+
+            saveButton.innerText = 'กำลังบันทึก...';
+            saveButton.disabled = true;
 
             try {
                 const dataToSave = { ...gameData };
                 delete dataToSave.gold;
                 const payload = {
                     saveId: playerName,
-                    gold: Math.floor(gameData.gold), // <-- แก้ไข: ปัดเศษทศนิยมลงก่อนบันทึก
+                    gold: Math.floor(gameData.gold),
                     gameDataJson: JSON.stringify(dataToSave)
                 };
 
@@ -161,14 +133,13 @@
                     body: JSON.stringify(payload)
                 });
                 
-                if (!isSilent) {
-                    alert(`เกมของคุณถูกบันทึกด้วยชื่อ: ${playerName}`);
-                }
+                alert(`เกมของคุณถูกบันทึกด้วยชื่อ: ${playerName}`);
             } catch (error) {
                 console.error('Error saving game:', error);
-                if (!isSilent) {
-                    alert('เกิดข้อผิดพลาดในการบันทึกเกม!');
-                }
+                alert('เกิดข้อผิดพลาดในการบันทึกเกม!');
+            } finally {
+                saveButton.innerText = 'บันทึกเกม';
+                saveButton.disabled = false;
             }
         }
         
@@ -195,6 +166,7 @@
             }
         }
         
+        // --- แก้ไข: ลบการบันทึกอัตโนมัติออกจากฟังก์ชันนี้ ---
         async function initializeGame() {
             playerName = playerNameInput.value.trim();
             if (!playerName) {
@@ -212,11 +184,10 @@
             
             setInterval(gameLoop, 1000);
             
-            setInterval(() => {
-                saveGame(true);
-            }, 5000);
+            // ลบการบันทึกอัตโนมัติออกไปแล้ว
         }
 
+        // --- ฟังก์ชันอื่นๆ (เหมือนเดิม) ---
         function getInitialGameData() { return { gold: 0, clickPower: { name: 'พลั่วขุดทอง', count: 1, level: 1, baseGpc: 1, buyCost: 20, upgradeCost: 500 }, items: { miner: { name: 'คนงานเหมือง', count: 0, level: 1, baseCost: 15, currentCost: 15, baseGps: 0.2, upgradeCost: 150 }, minecart: { name: 'รถเข็นขนแร่', count: 0, level: 1, baseCost: 120, currentCost: 120, baseGps: 1.5, upgradeCost: 1200 }, smelter: { name: 'โรงหลอม', count: 0, level: 1, baseCost: 1300, currentCost: 1300, baseGps: 10, upgradeCost: 15000 }, excavator: { name: 'รถขุดเจาะ', count: 0, level: 1, baseCost: 15000, currentCost: 15000, baseGps: 60, upgradeCost: 220000 } } }; }
         function buyClickPower() { const cp = gameData.clickPower; if (gameData.gold >= cp.buyCost) { gameData.gold -= cp.buyCost; cp.count++; cp.buyCost = Math.ceil(20 * Math.pow(1.18, cp.count - 1)); updateDisplay(); } }
         function upgradeClickPower() { const cp = gameData.clickPower; if (gameData.gold >= cp.upgradeCost) { gameData.gold -= cp.upgradeCost; cp.level++; cp.upgradeCost = Math.ceil(cp.upgradeCost * 4); updateDisplay(); } }
@@ -230,8 +201,11 @@
         function createFloatingNumber(text, element) { const number = document.createElement('div'); number.textContent = `+${Math.floor(text)}`; number.style.position = 'absolute'; number.style.fontSize = '1.5em'; number.style.fontWeight = 'bold'; number.style.color = '#ffd700'; number.style.textShadow = '1px 1px 2px #4a2c0c'; number.style.pointerEvents = 'none'; number.style.transition = 'transform 1s ease-out, opacity 1s ease-out'; const rect = element.getBoundingClientRect(); const gameContainerRect = document.querySelector('.game-container').getBoundingClientRect(); const xOffset = (Math.random() - 0.5) * 80; const yOffset = -50 - (Math.random() * 20); number.style.left = `${rect.left - gameContainerRect.left + rect.width / 2 + xOffset}px`; number.style.top = `${rect.top - gameContainerRect.top + rect.height / 2 + yOffset}px`; document.querySelector('.game-container').appendChild(number); requestAnimationFrame(() => { number.style.transform = 'translateY(-80px)'; number.style.opacity = '0'; }); setTimeout(() => { number.remove(); }, 1000); }
         function gameLoop() { const totalGps = calculateTotalGps(); gameData.gold += totalGps; updateDisplay(); }
 
+        // --- Event Listeners ---
         startGameButton.addEventListener('click', initializeGame);
         clickButton.addEventListener('click', mineGold);
+        saveButton.addEventListener('click', saveGame); // เพิ่ม Event Listener สำหรับปุ่ม Save
+
     </script>
 </body>
 </html>
