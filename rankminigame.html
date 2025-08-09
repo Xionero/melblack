@@ -10,24 +10,28 @@
             color: #eee;
             font-family: 'Courier New', monospace;
             display: flex;
-            justify-content: center; /* Center the whole container */
+            justify-content: center;
             align-items: flex-start;
             min-height: 70vh;
             margin: 0;
             padding-top: 20px;
         }
         .leaderboard-container {
-            display: flex; /* Arrange leaderboards side-by-side */
-            gap: 5px;      /* Reduce spacing between leaderboards */
+            display: flex;
+            gap: 5px;
         }
         .leaderboard {
             background-color: #333;
             padding: 10px;
             border-radius: 5px;
-            width: 180px; /* << UPDATED WIDTH */
+            width: 180px;
             text-align: center;
         }
-        .leaderboard h2 { margin-top: 0; color: #fff; font-size: 0.9em; }
+        .leaderboard h2 { 
+            margin-top: 0; 
+            font-size: 0.9em; 
+            color: #fff;
+        }
         .leaderboard ul { list-style: none; padding: 0; }
         .leaderboard li {
             padding: 3px 0;
@@ -36,6 +40,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: color 0.3s;
         }
         .leaderboard li:last-child { border-bottom: none; }
         .name {
@@ -44,32 +49,31 @@
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
-            max-width: 160px;  /* << UPDATED MAX-WIDTH */
+            max-width: 160px;
         }
         .score {
             text-align: right;
+            font-weight: bold;
         }
+        #donate-header { color: #FF4136; }
+        #gold-header { color: #FFD700; }
     </style>
 </head>
 <body>
 
     <div class="leaderboard-container">
-
         <div class="leaderboard">
-            <h2>Puzzle</h2>
+            <h2 id="puzzle-header">Puzzle</h2>
             <ul id="scoreList1"><li>Loading...</li></ul>
         </div>
-
         <div class="leaderboard">
-            <h2>Donate</h2>
+            <h2 id="donate-header">Donate</h2>
             <ul id="scoreList2"><li>Loading...</li></ul>
         </div>
-
         <div class="leaderboard">
-            <h2>Gold</h2>
+            <h2 id="gold-header">Gold</h2>
             <ul id="scoreList3"><li>Loading...</li></ul>
         </div>
-
     </div>
 
     <script>
@@ -80,27 +84,93 @@
         donate: document.getElementById("scoreList2"),
         gold: document.getElementById("scoreList3")
     };
+    
+    // --- ⭐ จุดที่ 1: สร้างฟังก์ชันสำหรับ "รวมยอดเงินตามชื่อ" ---
+    function aggregateScoresByName(data) {
+        if (!data || !Array.isArray(data)) return [];
 
-    function renderLeaderboard(element, data) {
+        // สร้าง Object เพื่อใช้เป็นตัวสะสมยอด
+        const summary = {};
+
+        // วนลูปข้อมูลดิบที่ได้รับมา
+        data.forEach(item => {
+            const name = item.name;
+            const score = Number(item.score) || 0; // แปลงคะแนนเป็นตัวเลข ป้องกัน Error
+
+            if (summary[name]) {
+                // ถ้ามีชื่อนี้ในตัวสะสมแล้ว ให้บวกคะแนนเพิ่มเข้าไป
+                summary[name] += score;
+            } else {
+                // ถ้ายังไม่มีชื่อนี้ ให้สร้างขึ้นมาใหม่
+                summary[name] = score;
+            }
+        });
+
+        // แปลง Object ที่ได้กลับไปเป็น Array ในรูปแบบที่ renderLeaderboard ต้องการ
+        // จาก { "UserA": 150, "UserB": 50 }
+        // เป็น [{ name: "UserA", score: 150 }, { name: "UserB", score: 50 }]
+        const aggregatedData = Object.keys(summary).map(name => ({
+            name: name,
+            score: summary[name]
+        }));
+        
+        return aggregatedData;
+    }
+
+
+    function applyStaticRainbow(elementId) {
+        const header = document.getElementById(elementId);
+        if (!header) return;
+        const text = header.textContent;
+        const colors = [
+    '#ffb3ba', // Pastel Red
+    '#ffdfba', // Pastel Orange
+    '#ffffba', // Pastel Yellow
+    '#baffc9', // Pastel Green
+    '#bae1ff', // Pastel Blue
+    '#d1baff'  // Pastel Purple
+]
+        const newHtml = text.split('').map((char, index) => {
+            const color = colors[index % colors.length];
+            return `<span style="color: ${color};">${char}</span>`;
+        }).join('');
+        header.innerHTML = newHtml;
+    }
+
+    function renderLeaderboard(element, data, type) {
         element.innerHTML = '';
         if (!data || data.length === 0) {
             element.innerHTML = '<li>No Data</li>';
             return;
         }
-        
         data.sort((a, b) => b.score - a.score)
             .slice(0, 10)
-            .forEach(item => {
+            .forEach((item, index) => {
                 const li = document.createElement('li');
-                
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'name';
                 nameSpan.textContent = item.name;
-                
                 const scoreSpan = document.createElement('span');
                 scoreSpan.className = 'score';
-                scoreSpan.textContent = item.score;
-                
+                let textColor = '#eee';
+                let scoreText = item.score;
+                if (type === 'puzzle') {
+                    if (index === 0) { textColor = '#FFD700'; }
+                    else if (index === 1) { textColor = '#C8A2C8'; }
+                    else if (index === 2) { textColor = '#87CEEB'; }
+                    else if (index === 3) { textColor = '#90EE90'; }
+                } else if (type === 'donate') {
+                    scoreText = Math.round(item.score).toLocaleString('th-TH');
+                    if (item.score >= 10000) { textColor = '#FFD700'; }
+                    else if (item.score >= 1000) { textColor = '#C8A2C8'; }
+                    else if (item.score >= 100) { textColor = '#87CEEB'; }
+                    else { textColor = '#FFFFFF'; }
+                } else if (type === 'gold') {
+                    scoreText = Math.round(item.score).toLocaleString('th-TH');
+                    textColor = '#FFD700';
+                }
+                li.style.color = textColor;
+                scoreSpan.textContent = scoreText;
                 li.appendChild(nameSpan);
                 li.appendChild(scoreSpan);
                 element.appendChild(li);
@@ -111,9 +181,14 @@
         fetch(MASTER_SCRIPT_URL)
             .then(response => response.json())
             .then(allData => {
-                renderLeaderboard(scoreLists.puzzle, allData.puzzle);
-                renderLeaderboard(scoreLists.donate, allData.donate);
-                renderLeaderboard(scoreLists.gold, allData.gold);
+                // --- ⭐ จุดที่ 2: เรียกใช้ฟังก์ชันรวมยอดเงินก่อนส่งไปแสดงผล ---
+                // ประมวลผลข้อมูลของตาราง Donate โดยเฉพาะ
+                const aggregatedDonateData = aggregateScoresByName(allData.donate);
+
+                // ส่งข้อมูลที่ประมวลผลแล้วไปแสดงผล
+                renderLeaderboard(scoreLists.puzzle, allData.puzzle, 'puzzle');
+                renderLeaderboard(scoreLists.donate, aggregatedDonateData, 'donate'); // ใช้ข้อมูลที่รวมยอดแล้ว
+                renderLeaderboard(scoreLists.gold, allData.gold, 'gold');
             })
             .catch(error => {
                 console.error('Error fetching all scores:', error);
@@ -125,6 +200,8 @@
 
     updateAllLeaderboards();
     setInterval(updateAllLeaderboards, 60000);
+    applyStaticRainbow('puzzle-header');
+
 </script>
 
 </body>
