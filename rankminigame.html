@@ -85,57 +85,51 @@
         gold: document.getElementById("scoreList3")
     };
     
-    // --- ⭐ จุดที่ 1: สร้างฟังก์ชันสำหรับ "รวมยอดเงินตามชื่อ" ---
-    function aggregateScoresByName(data) {
-        if (!data || !Array.isArray(data)) return [];
-
-        // สร้าง Object เพื่อใช้เป็นตัวสะสมยอด
-        const summary = {};
-
-        // วนลูปข้อมูลดิบที่ได้รับมา
-        data.forEach(item => {
-            const name = item.name;
-            const score = Number(item.score) || 0; // แปลงคะแนนเป็นตัวเลข ป้องกัน Error
-
-            if (summary[name]) {
-                // ถ้ามีชื่อนี้ในตัวสะสมแล้ว ให้บวกคะแนนเพิ่มเข้าไป
-                summary[name] += score;
-            } else {
-                // ถ้ายังไม่มีชื่อนี้ ให้สร้างขึ้นมาใหม่
-                summary[name] = score;
-            }
-        });
-
-        // แปลง Object ที่ได้กลับไปเป็น Array ในรูปแบบที่ renderLeaderboard ต้องการ
-        // จาก { "UserA": 150, "UserB": 50 }
-        // เป็น [{ name: "UserA", score: 150 }, { name: "UserB", score: 50 }]
-        const aggregatedData = Object.keys(summary).map(name => ({
-            name: name,
-            score: summary[name]
-        }));
-        
-        return aggregatedData;
-    }
-
-
     function applyStaticRainbow(elementId) {
         const header = document.getElementById(elementId);
         if (!header) return;
+
         const text = header.textContent;
+        
+        // --- ⭐ จุดที่แก้ไข: เปลี่ยนชุดสีเป็นโทนพาสเทลทั้งหมด ---
+        // เราเตรียมสีไว้ 6 สี พอดีกับคำว่า "Puzzle"
         const colors = [
-    '#ffb3ba', // Pastel Red
-    '#ffdfba', // Pastel Orange
-    '#ffffba', // Pastel Yellow
-    '#baffc9', // Pastel Green
-    '#bae1ff', // Pastel Blue
-    '#d1baff'  // Pastel Purple
-]
+            '#ffb3ba', // P - แดงพาสเทล
+            '#ffdfba', // u - ส้มพาสเทล
+            '#ffffba', // z - เหลืองพาสเทล
+            '#baffc9', // z - เขียวพาสเทล
+            '#bae1ff', // l - ฟ้าพาสเทล
+            '#d1baff'  // e - ม่วงพาสเทล (สีอ่อน สบายตา)
+        ];
+        
         const newHtml = text.split('').map((char, index) => {
             const color = colors[index % colors.length];
             return `<span style="color: ${color};">${char}</span>`;
         }).join('');
+
         header.innerHTML = newHtml;
     }
+
+
+    function aggregateScoresByName(data) {
+        if (!data || !Array.isArray(data)) return [];
+        const summary = {};
+        data.forEach(item => {
+            const name = item.name;
+            const score = Number(item.score) || 0;
+            if (summary[name]) {
+                summary[name] += score;
+            } else {
+                summary[name] = score;
+            }
+        });
+        const aggregatedData = Object.keys(summary).map(name => ({
+            name: name,
+            score: summary[name]
+        }));
+        return aggregatedData;
+    }
+
 
     function renderLeaderboard(element, data, type) {
         element.innerHTML = '';
@@ -181,13 +175,9 @@
         fetch(MASTER_SCRIPT_URL)
             .then(response => response.json())
             .then(allData => {
-                // --- ⭐ จุดที่ 2: เรียกใช้ฟังก์ชันรวมยอดเงินก่อนส่งไปแสดงผล ---
-                // ประมวลผลข้อมูลของตาราง Donate โดยเฉพาะ
                 const aggregatedDonateData = aggregateScoresByName(allData.donate);
-
-                // ส่งข้อมูลที่ประมวลผลแล้วไปแสดงผล
                 renderLeaderboard(scoreLists.puzzle, allData.puzzle, 'puzzle');
-                renderLeaderboard(scoreLists.donate, aggregatedDonateData, 'donate'); // ใช้ข้อมูลที่รวมยอดแล้ว
+                renderLeaderboard(scoreLists.donate, aggregatedDonateData, 'donate');
                 renderLeaderboard(scoreLists.gold, allData.gold, 'gold');
             })
             .catch(error => {
