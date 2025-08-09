@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Leaderboards</title>
+    <style>
+        body {
+            background-color: transparent;
+            color: #eee;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center; /* Center the whole container */
+            align-items: flex-start;
+            min-height: 70vh;
+            margin: 0;
+            padding-top: 20px;
+        }
+        .leaderboard-container {
+            display: flex; /* Arrange leaderboards side-by-side */
+            gap: 5px;      /* Reduce spacing between leaderboards */
+        }
+        .leaderboard {
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            width: 180px; /* << UPDATED WIDTH */
+            text-align: center;
+        }
+        .leaderboard h2 { margin-top: 0; color: #fff; font-size: 0.9em; }
+        .leaderboard ul { list-style: none; padding: 0; }
+        .leaderboard li {
+            padding: 3px 0;
+            border-bottom: 1px solid #555;
+            font-size: 0.75em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .leaderboard li:last-child { border-bottom: none; }
+        .name {
+            text-align: left;
+            flex-grow: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            max-width: 160px;  /* << UPDATED MAX-WIDTH */
+        }
+        .score {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="leaderboard-container">
+
+        <div class="leaderboard">
+            <h2>Puzzle</h2>
+            <ul id="scoreList1"><li>Loading...</li></ul>
+        </div>
+
+        <div class="leaderboard">
+            <h2>Donate</h2>
+            <ul id="scoreList2"><li>Loading...</li></ul>
+        </div>
+
+        <div class="leaderboard">
+            <h2>Gold</h2>
+            <ul id="scoreList3"><li>Loading...</li></ul>
+        </div>
+
+    </div>
+
+    <script>
+    const MASTER_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwPz2k7a6VjO0VbLp5D-M9K-eYp7G_g0rJc5HqO1p5u5i3o4tO13x9QpT0o918s_jXg/exec';
+
+    const scoreLists = {
+        puzzle: document.getElementById("scoreList1"),
+        donate: document.getElementById("scoreList2"),
+        gold: document.getElementById("scoreList3")
+    };
+
+    function renderLeaderboard(element, data) {
+        element.innerHTML = '';
+        if (!data || data.length === 0) {
+            element.innerHTML = '<li>No Data</li>';
+            return;
+        }
+        
+        data.sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .forEach(item => {
+                const li = document.createElement('li');
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'name';
+                nameSpan.textContent = item.name;
+                
+                const scoreSpan = document.createElement('span');
+                scoreSpan.className = 'score';
+                scoreSpan.textContent = item.score;
+                
+                li.appendChild(nameSpan);
+                li.appendChild(scoreSpan);
+                element.appendChild(li);
+            });
+    }
+
+    function updateAllLeaderboards() {
+        fetch(MASTER_SCRIPT_URL)
+            .then(response => response.json())
+            .then(allData => {
+                renderLeaderboard(scoreLists.puzzle, allData.puzzle);
+                renderLeaderboard(scoreLists.donate, allData.donate);
+                renderLeaderboard(scoreLists.gold, allData.gold);
+            })
+            .catch(error => {
+                console.error('Error fetching all scores:', error);
+                Object.values(scoreLists).forEach(list => {
+                    list.innerHTML = '<li>Error</li>';
+                });
+            });
+    }
+
+    updateAllLeaderboards();
+    setInterval(updateAllLeaderboards, 60000);
+</script>
+
+</body>
+</html>
