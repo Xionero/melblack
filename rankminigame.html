@@ -73,53 +73,59 @@
     </div>
 
     <script>
-        const scriptURLs = [
-            'https://script.google.com/macros/s/AKfycbzHvpumKBwI814GeE3oGS1W12LTVmyeiWpIoQ7OyVg8Xl_eYx68p1awxCJBSbVc2NZ3/exec', // puzzle
-            'https://script.google.com/macros/s/AKfycbzcTfRFkcwRJQe1FblbLfwnSGOVTsw8d3S9enYT-bF0HOkGQegfYkLq99eKvArWQF4w/exec',  // Donate
-            'https://script.google.com/macros/s/AKfycbyytX0M8PHNVknBED2GAGeiWwHLynwRbIPceXm5TGwHXvQ1zQO_hqCJHGzG116Cm2Mr/exec', // GoldRush
-        ];
-        const scoreLists = [
-            document.getElementById("scoreList1"),
-            document.getElementById("scoreList2"),
-            document.getElementById("scoreList3")
-        ];
+    const MASTER_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxERSP9yWBb3co_kiTzioalDot4a09CFhME0eA_Lr2XfUtxsOCrP3A8iVbe5A7eAQb0/exec';
 
-        function fetchAndDisplayScores(scriptURL, scoreListElement) {
-            fetch(scriptURL + '?action=getScores')
-                .then(response => response.json())
-                .then(data => {
-                    scoreListElement.innerHTML = '';
-                    data.sort((a, b) => b.score - a.score);
-                    data.slice(0, 10).forEach(score => {
-                        const li = document.createElement('li');
-                        const nameSpan = document.createElement('span');
-                        nameSpan.classList.add('name');
+    const scoreLists = {
+        puzzle: document.getElementById("scoreList1"),
+        donate: document.getElementById("scoreList2"),
+        gold: document.getElementById("scoreList3")
+    };
 
-                        // Truncate name if it's longer than 18 characters << UPDATED
-                        nameSpan.textContent = score.name.length > 18 ? score.name.substring(0, 18) + '...' : score.name;
-
-                        const scoreSpan = document.createElement('span');
-                        scoreSpan.classList.add('score');
-                        scoreSpan.textContent = score.score;
-
-                        li.appendChild(nameSpan);
-                        li.appendChild(scoreSpan);
-                        scoreListElement.appendChild(li);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching scores:', error);
-                    scoreListElement.innerHTML = '<li>Error</li>';
-                });
+    function renderLeaderboard(element, data) {
+        element.innerHTML = '';
+        if (!data || data.length === 0) {
+            element.innerHTML = '<li>No Data</li>';
+            return;
         }
+        
+        data.sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .forEach(item => {
+                const li = document.createElement('li');
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'name';
+                nameSpan.textContent = item.name;
+                
+                const scoreSpan = document.createElement('span');
+                scoreSpan.className = 'score';
+                scoreSpan.textContent = item.score;
+                
+                li.appendChild(nameSpan);
+                li.appendChild(scoreSpan);
+                element.appendChild(li);
+            });
+    }
 
-        // Initial load and refresh every 1 second
-        scriptURLs.forEach((url, index) => {
-            const scoreList = scoreLists[index];
-            fetchAndDisplayScores(url, scoreList);
-            setInterval(() => fetchAndDisplayScores(url, scoreList), 1000);
-        });
-    </script>
+    function updateAllLeaderboards() {
+        fetch(MASTER_SCRIPT_URL)
+            .then(response => response.json())
+            .then(allData => {
+                renderLeaderboard(scoreLists.puzzle, allData.puzzle);
+                renderLeaderboard(scoreLists.donate, allData.donate);
+                renderLeaderboard(scoreLists.gold, allData.gold);
+            })
+            .catch(error => {
+                console.error('Error fetching all scores:', error);
+                Object.values(scoreLists).forEach(list => {
+                    list.innerHTML = '<li>Error</li>';
+                });
+            });
+    }
+
+    updateAllLeaderboards();
+    setInterval(updateAllLeaderboards, 60000);
+</script>
 
 </body>
 </html>
